@@ -1,7 +1,7 @@
-const socket = new WebSocket('ws://45.141.76.83:8082/signaling/socket');
+const socket = new WebSocket('ws://localhost:8082/signaling/socket');
 
 socket.addEventListener('open', function (event) {
-    console.log('Connected to server');
+    socket.send(JSON.stringify({action: 'share-rooms'}));
 });
 
 socket.addEventListener('message', function (event) {
