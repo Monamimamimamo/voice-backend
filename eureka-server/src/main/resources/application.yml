@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: Eureka-server
+
+server:
+  port: 8081
+
+logging:
+  level:
+    com:
+      netflix:
+        eureka: OFF
+  pattern: console=%C{1.} [%-5level] %d{HH:mm:ss} - %msg%n
+
+
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+    service-url.defaultZone: http://localhost:8081/eureka
+  instance:
+    hostname: localhost
+    non-secure-port-enabled: false
+    secure-port-enabled: true
+    statusPageUrl: http://${eureka.instance.hostName}:${server.port}/info
+    healthCheckUrl: http://${eureka.instance.hostName}:${server.port}/health
+    homePageUrl: http://${eureka.instance.hostName}:${server.port}/
+
+
