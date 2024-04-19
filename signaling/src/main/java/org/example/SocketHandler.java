@@ -29,6 +29,7 @@ public class SocketHandler extends TextWebSocketHandler {
             }
             String action = actionNode.asText();
             String peerID;
+            System.out.println(action);
             switch (action) {
                 case "share-rooms":
                     shareRoomsInfo();
