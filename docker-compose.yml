@@ -1,6 +1,6 @@
 services:
   eureka-server:
-    image: eureka-server:1.0
+    image: eureka-server:1.2
     ports:
       - "8081:8081"
     environment:
@@ -21,7 +21,7 @@ services:
 
 
   gateway:
-    image: gateway:1.0
+    image: gateway:1.2
     depends_on:
       - eureka-server
     ports:
@@ -37,7 +37,7 @@ services:
       - spring.cloud.gateway.httpclient.ssl.useInsecureTrustManager=true
 
   signaling:
-    image: signaling:1.0
+    image: signaling:1.2
     depends_on:
       - gateway
     ports:
