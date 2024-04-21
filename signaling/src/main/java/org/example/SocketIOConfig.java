@@ -34,12 +34,10 @@ public class SocketIOConfig {
 
         SocketIOServer server = new SocketIOServer(config);
 
-        server.addEventListener("create", String.class, new DataListener<String>() {
-
+        server.addEventListener("create", JsonObject.class, new DataListener<JsonObject>() {
             @Override
-            public void onData(SocketIOClient client, String data, AckRequest ackRequest) {
-                System.out.println("********");
-                handleCreate(client, data);
+            public void onData(SocketIOClient client, JsonObject data, AckRequest ackRequest) {
+                handleCreate(client, String.valueOf(data));
             }
         });
 
