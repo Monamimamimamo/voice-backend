@@ -28,7 +28,7 @@ public class SocketHandler extends TextWebSocketHandler {
                 return;
             }
             String action = actionNode.asText();
-            String peerID;
+            JsonNode peerID;
             System.out.println(action);
             switch (action) {
                 case "share-rooms":
@@ -50,13 +50,13 @@ public class SocketHandler extends TextWebSocketHandler {
                     leaveRoom(json.get("room").asText(), session);
                     break;
                 case "relay-sdp":
-                    peerID = json.get("peerID").asText();
-                    String sessionDescription = json.get("sessionDescription").asText();
+                    peerID = json.get("peerID");
+                    JsonNode sessionDescription = json.get("sessionDescription");
                     relayMessage("session-description", session.getId(), peerID, sessionDescription);
                     break;
                 case "relay-ice":
-                    peerID = json.get("peerID").asText();
-                    String iceCandidate = json.get("iceCandidate").asText();
+                    peerID = json.get("peerID");
+                    JsonNode iceCandidate = json.get("iceCandidate");
                     relayMessage("ice-candidate", session.getId(), peerID, iceCandidate);
                     break;
             }
@@ -147,7 +147,7 @@ public class SocketHandler extends TextWebSocketHandler {
                         sessions.get(newMemberId).sendMessage(new TextMessage(new ObjectMapper().writeValueAsString(Map.of(
                                 "action", "add-peer",
                                 "peerID", session.getId(),
-                                "createOffer", false
+                                "createOffer", true
                         ))));
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -158,7 +158,7 @@ public class SocketHandler extends TextWebSocketHandler {
     }
 
 
-    private void relayMessage(String action, String fromId, String toId, String message) {
+    private void relayMessage(String action, String fromId, JsonNode toId, JsonNode message) {
         WebSocketSession toSession = sessions.get(toId);
         if (toSession != null) {
             try {
