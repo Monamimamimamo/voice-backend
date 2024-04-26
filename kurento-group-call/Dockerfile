@@ -1,6 +1,6 @@
 FROM openjdk:21-jdk-slim
 
-COPY target/signaling-1.0-SNAPSHOT.jar /app.jar
+COPY target/kurento-group-call-1.0-SNAPSHOT.jar /app.jar
 
 WORKDIR /app
 

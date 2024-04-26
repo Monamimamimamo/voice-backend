@@ -36,11 +36,11 @@ services:
       - management.endpoints.web.exposure.include=info
       - spring.cloud.gateway.httpclient.ssl.useInsecureTrustManager=true
 
-  signaling:
-    image: monamimamimamo/signaling:1.2
+  kurento-group-call:
+    image: monamimamimamo/kurento-group-call:1.0
     depends_on:
       - gateway
     ports:
-      - "9000:9000"
+      - "8443:8443"
     environment:
       - eureka.client.service-url.defaultZone=http://eureka-server:8081/eureka
