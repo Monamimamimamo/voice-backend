@@ -1,5 +1,3 @@
-server:
-  port: 8443
 
 eureka:
   client:
@@ -9,3 +7,10 @@ eureka:
 spring:
   application:
     name: kurento-group-call
+
+server:
+  port: 8443
+  ssl:
+    key-store: classpath:keystore.jks
+    key-store-password: aA258007195
+    key-store-type: JKS
