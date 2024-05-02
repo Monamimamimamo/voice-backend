@@ -1,8 +1,10 @@
 package org.kurento.tutorial.groupcall;
 
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.kurento.client.KurentoClient;
 import org.slf4j.Logger;
@@ -24,11 +26,22 @@ public class RoomManager {
         Room room = rooms.get(roomName);
 
         if (room == null) {
-            log.debug("Room {} not existent. Will create now!", roomName);
-            room = new Room(roomName, kurento.createMediaPipeline());
-            rooms.put(roomName, room);
+            log.debug("Room {} not existent.", roomName);
+            return null; // или выбросите исключение
         }
         log.debug("Room {} found!", roomName);
+        return room;
+    }
+
+    public Room createRoom(String roomName) {
+        Room room = rooms.get(roomName);
+        if (room == null) {
+            room = new Room(roomName, kurento.createMediaPipeline());
+            rooms.put(roomName, room);
+            log.debug("Room {} created!", roomName);
+        } else {
+            throw new IllegalArgumentException("Room with name " + roomName + " already exists.");
+        }
         return room;
     }
 
@@ -39,4 +52,7 @@ public class RoomManager {
         log.info("Room {} removed and closed", room.getName());
     }
 
+    public Set<String> getRoomNames() {
+        return rooms.keySet();
+    }
 }

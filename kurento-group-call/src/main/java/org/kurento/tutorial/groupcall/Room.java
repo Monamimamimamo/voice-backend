@@ -34,7 +34,6 @@ public class Room implements Closeable {
     this.pipeline = pipeline;
     log.info("ROOM {} has been created", roomName);
   }
-
   @PreDestroy
   private void shutdown() {
     this.close();

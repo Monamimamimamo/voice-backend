@@ -37,7 +37,7 @@ services:
       - spring.cloud.gateway.httpclient.ssl.useInsecureTrustManager=true
 
   kurento-group-call:
-    image: monamimamimamo/kurento-group-call:1.1
+    image: monamimamimamo/kurento-group-call:1.2
     depends_on:
       - gateway
     ports:
