@@ -1,39 +1,32 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.4</version>
-        <relativePath/>
+        <groupId>org.example</groupId>
+        <artifactId>voice-backend</artifactId>
+        <version>1.0-SNAPSHOT</version>
     </parent>
-    <groupId>org.example</groupId>
-    <artifactId>gateway</artifactId>
-    <version>1.0-SNAPSHOT</version>
+
+    <artifactId>p2p-signaling</artifactId>
     <packaging>jar</packaging>
 
-    <name>gateway</name>
+    <name>p2p-signaling</name>
     <url>http://maven.apache.org</url>
+
     <properties>
-        <spring-cloud.version>2023.0.1</spring-cloud.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencies>
         <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-gateway</artifactId>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-websocket</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
         </dependency>
     </dependencies>
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-dependencies</artifactId>
-                <version>${spring-cloud.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <build>
         <plugins>
@@ -48,7 +41,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>org.example.GatewayApplication</mainClass>
+                            <mainClass>org.example.P2PApplication</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

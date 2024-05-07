@@ -47,8 +47,8 @@
 
   <modules>
     <module>kurento-group-call</module>
-    <module>eureka-server</module>
     <module>gateway</module>
+      <module>p2p-signaling</module>
   </modules>
 
 </project>

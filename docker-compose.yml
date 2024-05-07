@@ -1,46 +1,31 @@
 services:
-  eureka-server:
-    image: monamimamimamo/eureka-server:1.2
-    ports:
-      - "8081:8081"
-    environment:
-      - spring.application.name=Eureka-server
-      - server.port=8081
-      - eureka.client.register-with-eureka=false
-      - eureka.client.fetch-registry=false
-      - eureka.client.service-url.defaultZone=http://localhost:8081/eureka
-      - logging.level.com.netflix.eureka=OFF
-      - logging.level.com.netflix.discovery=OFF
-      - logging.pattern.console=%C{1.} [%-5level] %d{HH:mm:ss} - %msg%n
-      - eureka.instance.hostname=localhost
-      - eureka.instance.non-secure-port-enabled=false
-      - eureka.instance.secure-port-enabled=true
-      - eureka.instance.statusPageUrl=http://localhost:8081/info
-      - eureka.instance.healthCheckUrl=http://localhost:8081/health
-      - eureka.instance.homePageUrl=http://localhost:8081/
-
-
   gateway:
-    image: monamimamimamo/gateway:1.2
-    depends_on:
-      - eureka-server
+    image: monamimamimamo/gateway:1.3
     ports:
       - "8082:8082"
     environment:
-      - spring.application.name=api-gateway
-      - server.port=8082
-      - eureka.client.service-url.defaultZone=http://eureka-server:8081/eureka
-      - logging.pattern.console=%C{1.} [%-5level] %d{HH:mm:ss} - %msg%n
-      - spring.cloud.gateway.discovery.locator.enabled=true
-      - spring.cloud.gateway.discovery.locator.lower-case-service-id=true
-      - management.endpoints.web.exposure.include=info
-      - spring.cloud.gateway.httpclient.ssl.useInsecureTrustManager=true
+      - server.ssl.key-store=classpath:keystore.jks
+      - server.ssl.key-store-type=JKS
+      - server.ssl.key-store-password=aA258007195
 
   kurento-group-call:
-    image: monamimamimamo/kurento-group-call:1.2
+    image: monamimamimamo/kurento-group-call:1.3
     depends_on:
       - gateway
     ports:
       - "8443:8443"
     environment:
-      - eureka.client.service-url.defaultZone=http://eureka-server:8081/eureka
+      - server.ssl.key-store=classpath:keystore.jks
+      - server.ssl.key-store-type=JKS
+      - server.ssl.key-store-password=aA258007195
+
+  p2p-signaling:
+    image: monamimamimamo/p2p-signaling:1.0
+    depends_on:
+      - gateway
+    ports:
+      - "9000:9000"
+    environment:
+      - server.ssl.key-store=classpath:keystore.jks
+      - server.ssl.key-store-type=JKS
+      - server.ssl.key-store-password=aA258007195

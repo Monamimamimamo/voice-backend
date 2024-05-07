@@ -1,12 +1,10 @@
-
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8081/eureka
-
 spring:
   application:
     name: kurento-group-call
 
 server:
   port: 8443
+  ssl:
+    key-store: classpath:keystore.jks
+    key-store-password: aA258007195
+    key-store-type: JKS
