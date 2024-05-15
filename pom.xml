@@ -49,6 +49,7 @@
     <module>kurento-group-call</module>
     <module>gateway</module>
       <module>p2p-signaling</module>
+      <module>p2p-chat</module>
   </modules>
 
 </project>

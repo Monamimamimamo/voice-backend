@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${db_port:localhost}:5432/p2p_chat
+    username: postgres
+    password: 123
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+server:
+  port: 9000
