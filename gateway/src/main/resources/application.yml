@@ -11,6 +11,14 @@ spring:
   cloud:
     gateway:
       routes:
+        - id: p2p_chat_http_route
+          uri: https://p2p-chat:9001
+          predicates:
+            - Path=/chat/**
+        - id: p2p_chat_ws_route
+          uri: https://p2p-chat:9001
+          predicates:
+            - Path=/chat
         - id: groupCall_route
           uri: wss://kurento-group-call:8443
           predicates:

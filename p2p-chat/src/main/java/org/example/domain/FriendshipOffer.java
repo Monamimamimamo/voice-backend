@@ -4,19 +4,21 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.antlr.v4.runtime.misc.NotNull;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Data
-public class Message {
+public class FriendshipOffer {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String content;
+    @NotNull
+    private String status;
 
     private LocalDateTime timestamp;
 

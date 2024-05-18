@@ -10,9 +10,16 @@
 <h1>Чат</h1>
 <div id="messages"></div>
 <form onsubmit="sendMessage(event)">
-    <input type="text" id="messageInput" placeholder="Введите сообщение...">
+    <label for="userId1">Ваш ID:</label>
+    <input type="text" id="userId1" required>
+    <br>
+    <label for="userId2">ID получателя:</label>
+    <input type="text" id="userId2" required>
+    <br>
+    <input type="text" id="messageInput" placeholder="Введите сообщение..." required>
     <button type="submit">Отправить</button>
 </form>
+<button onclick="subscribeToChannel()">Подписаться на канал</button>
 
 <!-- Подключаем JavaScript -->
 <script src="p2pChatTest.js"></script>

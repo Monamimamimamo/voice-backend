@@ -1,9 +1,17 @@
 spring:
+  application:
+    name: p2p-chat
   datasource:
-    url: jdbc:postgresql://${db_port:localhost}:5432/p2p_chat
+    url: jdbc:postgresql://localhost:5432/p2p_chat
     username: postgres
     password: 123
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
 server:
-  port: 9000
+  port: 9001
+  ssl:
+    key-store: classpath:keystore.jks
+    key-store-password: aA258007195
+    key-store-type: JKS
