@@ -11,7 +11,7 @@ spring:
       ddl-auto: update
 server:
   port: 9001
-  ssl:
-    key-store: classpath:keystore.jks
-    key-store-password: aA258007195
-    key-store-type: JKS
+#  ssl:
+#    key-store: classpath:keystore.jks
+#    key-store-password: aA258007195
+#    key-store-type: JKS

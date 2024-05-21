@@ -50,6 +50,7 @@
     <module>gateway</module>
       <module>p2p-signaling</module>
       <module>p2p-chat</module>
+      <module>friendship-manager</module>
   </modules>
 
 </project>

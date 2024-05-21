@@ -7,9 +7,19 @@
 </head>
 <body>
 <h1>P2P Connection Example</h1>
-<button id="start">Начать соединение</button>
+<label for="senderId">Your ID:</label>
+<input type="text" id="senderId" required>
+<br>
+<label for="receiverId">Receiver ID:</label>
+<input type="text" id="receiverId" required>
+<br>
+<button onclick="subscribeToChannel()">Start Connection</button>
+<br>
+<button onclick="goVideo()">Start Video</button>
 <div id="messages"></div>
 <video id="remoteVideo" autoplay></video>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.5/sockjs.min.js"></script>
+<script src="stomp.js"></script>
 <script src="p2p.js"></script>
 </body>
 </html>
