@@ -1,11 +1,32 @@
 server:
   port: 8082
+  ssl:
+    key-store: classpath:keystore.jks
+    key-store-password: aA258007195
+    key-store-type: JKS
 
 spring:
   application:
     name: api-gateway
   cloud:
     gateway:
+      routes:
+        - id: p2p_chat_http_route
+          uri: https://p2p-chat:9001
+          predicates:
+            - Path=/chat/**
+        - id: groupCall_route
+          uri: wss://kurento-group-call:8443
+          predicates:
+            - Path=/groupcall
+        - id: p2p_signaling_route
+          uri: https://p2p-signaling:9000
+          predicates:
+            - Path=/signaling/**
+        - id: friendship_route
+          uri: https://friendship-manager:9898
+          predicates:
+            - Path=/friendship/**
       httpclient:
         ssl:
           useInsecureTrustManager: true
@@ -22,7 +43,3 @@ management:
     web:
       exposure:
         include: info\\\
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8081/eureka

@@ -1,0 +1,23 @@
+server:
+  port: 9898
+#  ssl:
+#    key-store: classpath:keystore.jks
+#    key-store-password: aA258007195
+#    key-store-type: JKS
+
+spring:
+  application:
+    name: friendship-manager
+  datasource:
+    url: jdbc:postgresql://localhost:5432/friendship_manager
+    username: postgres
+    password: 123
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer

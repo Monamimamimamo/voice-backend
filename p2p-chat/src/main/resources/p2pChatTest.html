@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Чат</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.5/sockjs.min.js"></script>
+    <script src="stomp.js"></script>
+</head>
+<body>
+<h1>Чат</h1>
+<div id="messages"></div>
+<form onsubmit="sendMessage(event)">
+    <label for="userId1">Ваш ID:</label>
+    <input type="text" id="userId1" required>
+    <br>
+    <label for="userId2">ID получателя:</label>
+    <input type="text" id="userId2" required>
+    <br>
+    <button onclick="subscribeToChannel()">Подписаться на канал</button>
+    <br>
+    <button onclick="sendFriendRequest()">Запрос дружбы</button>
+    <br>
+    <input type="text" id="messageInput" placeholder="Введите сообщение..." required>
+    <button type="submit">Отправить</button>
+</form>
+
+<!-- Подключаем JavaScript -->
+<script src="p2pChatTest.js"></script>
+</body>
+</html>

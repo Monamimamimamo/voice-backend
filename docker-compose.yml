@@ -1,46 +1,89 @@
 services:
-  eureka-server:
-    image: monamimamimamo/eureka-server:1.0
-    ports:
-      - "8081:8081"
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
     environment:
-      - spring.application.name=Eureka-server
-      - server.port=8081
-      - eureka.client.register-with-eureka=false
-      - eureka.client.fetch-registry=false
-      - eureka.client.service-url.defaultZone=http://localhost:8081/eureka
-      - logging.level.com.netflix.eureka=OFF
-      - logging.level.com.netflix.discovery=OFF
-      - logging.pattern.console=%C{1.} [%-5level] %d{HH:mm:ss} - %msg%n
-      - eureka.instance.hostname=localhost
-      - eureka.instance.non-secure-port-enabled=false
-      - eureka.instance.secure-port-enabled=true
-      - eureka.instance.statusPageUrl=http://localhost:8081/info
-      - eureka.instance.healthCheckUrl=http://localhost:8081/health
-      - eureka.instance.homePageUrl=http://localhost:8081/
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - "9002:9002"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9002
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
 
   gateway:
-    image: monamimamimamo/gateway:1.0
-    depends_on:
-      - eureka-server
+
+    image: monamimamimamo/gateway:1.5
     ports:
       - "8082:8082"
     environment:
-      - spring.application.name=api-gateway
-      - server.port=8082
-      - eureka.client.service-url.defaultZone=http://eureka-server:8081/eureka
-      - logging.pattern.console=%C{1.} [%-5level] %d{HH:mm:ss} - %msg%n
-      - spring.cloud.gateway.discovery.locator.enabled=true
-      - spring.cloud.gateway.discovery.locator.lower-case-service-id=true
-      - management.endpoints.web.exposure.include=info
-      - spring.cloud.gateway.httpclient.ssl.useInsecureTrustManager=true
+      - server.ssl.key-store=classpath:keystore.jks
+      - server.ssl.key-store-type=JKS
+      - server.ssl.key-store-password=aA258007195
 
-  signaling:
-    image: monamimamimamo/signaling:1.0
+  p2p-signaling:
+    image: monamimamimamo/p2p-signaling:1.1
     depends_on:
       - gateway
     ports:
       - "9000:9000"
     environment:
-      - eureka.client.service-url.defaultZone=http://eureka-server:8081/eureka
+      - server.ssl.key-store=classpath:keystore.jks
+      - server.ssl.key-store-type=JKS
+      - server.ssl.key-store-password=aA258007195
+
+  p2p-chat:
+    image: monamimamimamo/p2p-chat:1.1
+    depends_on:
+      - gateway
+      - db1
+    ports:
+      - "9001:9001"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db1:5432/p2p_chat
+      server.ssl.key-store: classpath:keystore.jks
+      server.ssl.key-store-type: JKS
+      server.ssl.key-store-password: aA258007195
+
+  friendship-manager:
+    image: monamimamimamo/friendship-manager:1.0
+    depends_on:
+      - gateway
+      - db2
+    ports:
+      - "9898:9898"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db2:5432/friendship_manager
+      server.ssl.key-store: classpath:keystore.jks
+      server.ssl.key-store-type: JKS
+      server.ssl.key-store-password: aA258007195
+
+  db1:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: p2p_chat
+    ports:
+      - "5432:5432"
+
+  db2 :
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: friendship_manager
+    ports:
+      - "5431:5432"
+
+volumes:
+  db_data:
