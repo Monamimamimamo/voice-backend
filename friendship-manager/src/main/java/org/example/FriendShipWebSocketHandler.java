@@ -2,6 +2,7 @@ package org.example;
 
 import org.example.domain.FriendshipOffer;
 import org.example.domain.FriendshipOfferRepo;
+import org.example.domain.KafkaFriendshipMessage;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -21,9 +22,11 @@ import java.util.Objects;
 public class FriendShipWebSocketHandler {
 
     private final FriendshipOfferRepo friendshipOfferRepo;
+    private final KafkaProducer kafkaProducer;
 
-    public FriendShipWebSocketHandler(FriendshipOfferRepo friendshipOfferRepo) {
+    public FriendShipWebSocketHandler(FriendshipOfferRepo friendshipOfferRepo, KafkaProducer kafkaProducer) {
         this.friendshipOfferRepo = friendshipOfferRepo;
+        this.kafkaProducer = kafkaProducer;
     }
 
 
@@ -52,7 +55,8 @@ public class FriendShipWebSocketHandler {
             if(Objects.equals(friendshipOffer.getStatus(), "pending")){
                 friendshipOffer.setStatus(status);
             }
-            //TODO через кафку добавить в список друзей элемент
+            KafkaFriendshipMessage kafkaMessage = new KafkaFriendshipMessage(receiverId, senderId);
+            kafkaProducer.sendMessage(kafkaMessage);
         } else {
             friendshipOffer = friendshipOfferRepo.findBySenderAndReceiver(senderId, receiverId);
             if(Objects.equals(friendshipOffer.getStatus(), "pending")){

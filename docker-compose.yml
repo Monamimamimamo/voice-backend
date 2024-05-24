@@ -1,6 +1,26 @@
 services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - "9002:9002"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9002
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+
   gateway:
-    image: monamimamimamo/gateway:1.4
+    image: monamimamimamo/gateway:1.5
     ports:
       - "8082:8082"
     environment:
@@ -8,19 +28,8 @@ services:
       - server.ssl.key-store-type=JKS
       - server.ssl.key-store-password=aA258007195
 
-  kurento-group-call:
-    image: monamimamimamo/kurento-group-call:1.3
-    depends_on:
-      - gateway
-    ports:
-      - "8443:8443"
-    environment:
-      - server.ssl.key-store=classpath:keystore.jks
-      - server.ssl.key-store-type=JKS
-      - server.ssl.key-store-password=aA258007195
-
   p2p-signaling:
-    image: monamimamimamo/p2p-signaling:1.0
+    image: monamimamimamo/p2p-signaling:1.1
     depends_on:
       - gateway
     ports:
@@ -31,16 +40,32 @@ services:
       - server.ssl.key-store-password=aA258007195
 
   p2p-chat:
-    image: monamimamimamo/p2p_chat:1.0
+    image: monamimamimamo/p2p-chat:1.1
     depends_on:
       - gateway
-      - db
+      - db1
     ports:
       - "9001:9001"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/p2p_chat
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db1:5432/p2p_chat
+      server.ssl.key-store: classpath:keystore.jks
+      server.ssl.key-store-type: JKS
+      server.ssl.key-store-password: aA258007195
 
-  db:
+  friendship-manager:
+    image: monamimamimamo/friendship-manager:1.0
+    depends_on:
+      - gateway
+      - db2
+    ports:
+      - "9898:9898"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db2:5432/friendship_manager
+      server.ssl.key-store: classpath:keystore.jks
+      server.ssl.key-store-type: JKS
+      server.ssl.key-store-password: aA258007195
+
+  db1:
     image: postgres:latest
     environment:
       POSTGRES_USER: postgres
@@ -48,6 +73,15 @@ services:
       POSTGRES_DB: p2p_chat
     ports:
       - "5432:5432"
+
+  db2 :
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: friendship_manager
+    ports:
+      - "5431:5432"
 
 volumes:
   db_data:

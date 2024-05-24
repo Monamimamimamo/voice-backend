@@ -1,17 +1,22 @@
-var socket = new SockJS('http://localhost:9001/chat');
-var friendshipSocket = new SockJS('http://localhost:9898/friendship');
+var socket = new SockJS('https://voice-backend.ru:8082/chat');
+var friendshipSocket = new SockJS('https://voice-backend.ru:8082/friendship');
 var stompClient = Stomp.over(socket);
 var friendshipClient = Stomp.over(friendshipSocket);
+
+
+const headers = {
+    Authorization: 'Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9lbWFpbGFkZHJlc3MiOiJTaHVrc2hpbm1ha3NpbS5ydUBtYWlsLnJ1IiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6IlNodWtzaGlubWFrc2ltLnJ1QG1haWwucnUiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBZG1pbiIsImV4cCI6MTcxNjIzMTM3MCwiaXNzIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NzI2NiIsImF1ZCI6Imh0dHBzOi8vbG9jYWxob3N0OjcyNjYifQ.gl6KyviYyB8hNAQ5fjZ_vGjlR8w4koJjfqHumoSw5m8",
+};
 
 // Функция для подключения к серверу
 function connect() {
     if (!stompClient.connected) {
-        stompClient.connect({}, function(frame) {
+        stompClient.connect(headers, function(frame) {
             console.log('Connected: ' + frame);
         });
     }
         if (!friendshipClient.connected) {
-            friendshipClient.connect({}, function(frame) {
+            friendshipClient.connect(headers, function(frame) {
                 console.log('Connected: ' + frame);
             });
         }
