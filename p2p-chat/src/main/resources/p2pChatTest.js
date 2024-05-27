@@ -91,8 +91,30 @@ function displayFriendshipMessage(message) {
     var messagesDiv = document.getElementById('messages');
     var p = document.createElement('p');
     p.textContent = `${message.sender} отправил запрос дружбы ${message.receiver} в ${new Date(message.timestamp).toLocaleTimeString()} (${message.status})`;
+
+    // Добавляем кнопки согласия и отказа
+    var acceptButton = document.createElement('button');
+    acceptButton.textContent = 'Согласиться';
+    acceptButton.onclick = function() {
+        handleAcceptFriendRequest(message);
+    };
+
+    p.appendChild(acceptButton);
+
     messagesDiv.appendChild(p);
 }
 
+function handleAcceptFriendRequest(message) {
+    var userId1 = document.getElementById('userId1').value;
+    var userId2 = document.getElementById('userId2').value;
+
+    // Отправляем сообщение с подтверждением дружбы
+    friendshipClient.send(`/app/friendship/${userId2}`, {}, JSON.stringify({
+        'timestamp': new Date().getTime(), // Генерируем текущее время в миллисекундах
+        'sender': userId1,
+        'receiver': userId2,
+        'status': 'accepted'
+    }));
+}
 // Подключаемся к серверу при загрузке страницы
 connect();

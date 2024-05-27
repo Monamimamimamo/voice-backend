@@ -36,14 +36,14 @@ public class FriendshipController {
         if (authHeader == null ||!authHeader.startsWith("Bearer ")) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED); // Unauthorized access
         }
-        String token = authHeader.substring(7);
-        Claims claims = Jwts.parser()
-                .setSigningKey("FBF0E5C5-056A-4DE9-A9B4-CAC04513C5D8".getBytes())
-                .parseClaimsJws(token)
-                .getBody();
-        String userName = claims.get("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress", String.class);
+//        String token = authHeader.substring(7);
+//        Claims claims = Jwts.parser()
+//                .setSigningKey("FBF0E5C5-056A-4DE9-A9B4-CAC04513C5D8".getBytes())
+//                .parseClaimsJws(token)
+//                .getBody();
+//        String userName = claims.get("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress", String.class);
 
-        List<FriendshipOffer> acceptedOffers = friendshipService.getAcceptedOffers(userName);
+        List<FriendshipOffer> acceptedOffers = friendshipService.getAcceptedOffers("");
         return ResponseEntity.ok(acceptedOffers);
     }
 
@@ -55,13 +55,13 @@ public class FriendshipController {
         if (authHeader == null ||!authHeader.startsWith("Bearer ")) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED); // Unauthorized access
         }
-        String token = authHeader.substring(7);
-        Claims claims = Jwts.parser()
-                .setSigningKey("FBF0E5C5-056A-4DE9-A9B4-CAC04513C5D8".getBytes())
-                .parseClaimsJws(token)
-                .getBody();
-        String userName = claims.get("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress", String.class);
-        List<FriendshipOffer> acceptedOffers = friendshipService.getPendingOffers(userName);
+//        String token = authHeader.substring(7);
+//        Claims claims = Jwts.parser()
+//                .setSigningKey("FBF0E5C5-056A-4DE9-A9B4-CAC04513C5D8".getBytes())
+//                .parseClaimsJws(token)
+//                .getBody();
+//        String userName = claims.get("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress", String.class);
+        List<FriendshipOffer> acceptedOffers = friendshipService.getPendingOffers("123");
         return ResponseEntity.ok(acceptedOffers);
     }
 
@@ -71,13 +71,13 @@ public class FriendshipController {
         if (authHeader == null ||!authHeader.startsWith("Bearer ")) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED); // Unauthorized access
         }
-        String token = authHeader.substring(7);
-        Claims claims = Jwts.parser()
-                .setSigningKey("FBF0E5C5-056A-4DE9-A9B4-CAC04513C5D8".getBytes())
-                .parseClaimsJws(token)
-                .getBody();
-        String userName = claims.get("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress", String.class);
-        List<FriendshipOffer> acceptedOffers = friendshipService.getRefusedOffers(userName);
+//        String token = authHeader.substring(7);
+//        Claims claims = Jwts.parser()
+//                .setSigningKey("FBF0E5C5-056A-4DE9-A9B4-CAC04513C5D8".getBytes())
+//                .parseClaimsJws(token)
+//                .getBody();
+//        String userName = claims.get("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress", String.class);
+        List<FriendshipOffer> acceptedOffers = friendshipService.getRefusedOffers("");
         return ResponseEntity.ok(acceptedOffers);
     }
 }

@@ -9,9 +9,17 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: my-group-id
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            value:
+              default:
+                type: org.example.domain.KafkaFriendshipMessage
+
 server:
-  port: 9001
-#  ssl:
-#    key-store: classpath:keystore.jks
-#    key-store-password: aA258007195
-#    key-store-type: JKS
+  port: 9003

@@ -2,8 +2,10 @@ services:
 
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
+    depends_on:
+      - db
     environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_CLIENT_PORT: 9000
       ZOOKEEPER_TICK_TIME: 2000
 
 
@@ -12,16 +14,38 @@ services:
     depends_on:
       - zookeeper
     ports:
-      - "9002:9002"
+      - "9001:9001"
     environment:
       KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9002
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:9000
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9001
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
 
-  gateway:
+  messages-db:
+    image: postgres:latest
+    depends_on:
+      - kafka
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: p2p_chat
+    ports:
+      - "5430:5432"
 
+  friendship-offers-db:
+    image: postgres:latest
+    depends_on:
+      - kafka
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: friendship_manager
+    ports:
+      - "5431:5432"
+
+
+  gateway:
     image: monamimamimamo/gateway:1.5
     ports:
       - "8082:8082"
@@ -35,7 +59,7 @@ services:
     depends_on:
       - gateway
     ports:
-      - "9000:9000"
+      - "9002:9002"
     environment:
       - server.ssl.key-store=classpath:keystore.jks
       - server.ssl.key-store-type=JKS
@@ -45,45 +69,56 @@ services:
     image: monamimamimamo/p2p-chat:1.1
     depends_on:
       - gateway
-      - db1
+      - messages-db
     ports:
-      - "9001:9001"
+      - "9003:9003"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db1:5432/p2p_chat
+      SPRING_DATASOURCE_URL: jdbc:postgresql://messages-db:5432/p2p_chat
       server.ssl.key-store: classpath:keystore.jks
       server.ssl.key-store-type: JKS
       server.ssl.key-store-password: aA258007195
+      spring.kafka.bootstrap-servers: kafka:9001
 
   friendship-manager:
     image: monamimamimamo/friendship-manager:1.0
     depends_on:
       - gateway
-      - db2
+      - friendship-offers-db
     ports:
-      - "9898:9898"
+      - "9004:9004"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db2:5432/friendship_manager
+      SPRING_DATASOURCE_URL: jdbc:postgresql://friendship-offers-db:5432/friendship_manager
       server.ssl.key-store: classpath:keystore.jks
       server.ssl.key-store-type: JKS
       server.ssl.key-store-password: aA258007195
+      spring.kafka.bootstrap-servers: kafka:9001
 
-  db1:
+
+  identity.webapi:
+    image: monamimamimamo/identitywebapi
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=UserTest;Username=postgres;Password=qe13zc24680
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ASPNETCORE_HTTPS_PORTS=8081
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    depends_on:
+      - friendship-manager
+    volumes:
+      - ../root:/home/app/.microsoft/usersecrets:ro
+      - ../root:/home/app/.aspnet/https:ro
+
+
+  db:
     image: postgres:latest
     environment:
+      POSTGRES_DB: UserTest
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 123
-      POSTGRES_DB: p2p_chat
+      POSTGRES_PASSWORD: qe13zc24680
     ports:
       - "5432:5432"
-
-  db2 :
-    image: postgres:latest
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 123
-      POSTGRES_DB: friendship_manager
-    ports:
-      - "5431:5432"
 
 volumes:
   db_data:

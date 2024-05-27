@@ -1,10 +1,5 @@
 server:
-  port: 9000
-#  ssl:
-#    key-store: classpath:keystore.jks
-#    key-store-password: aA258007195
-#    key-store-type: JKS
-#
+  port: 9002
 spring:
   application:
     name: p2p-signaling

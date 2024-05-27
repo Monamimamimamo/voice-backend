@@ -12,7 +12,7 @@ spring:
     gateway:
       routes:
         - id: p2p_chat_http_route
-          uri: https://p2p-chat:9001
+          uri: https://p2p-chat:9003
           predicates:
             - Path=/chat/**
         - id: groupCall_route
@@ -20,11 +20,11 @@ spring:
           predicates:
             - Path=/groupcall
         - id: p2p_signaling_route
-          uri: https://p2p-signaling:9000
+          uri: https://p2p-signaling:9002
           predicates:
             - Path=/signaling/**
         - id: friendship_route
-          uri: https://friendship-manager:9898
+          uri: https://friendship-manager:9004
           predicates:
             - Path=/friendship/**
       httpclient:

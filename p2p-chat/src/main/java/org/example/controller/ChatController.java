@@ -1,8 +1,9 @@
 package org.example.controller;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.example.domain.KafkaFriendshipMessage;
 import org.springframework.http.HttpHeaders;
 import org.example.domain.Message;
 import org.example.domain.MessageRepo;
@@ -11,22 +12,33 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 @RestController
+@Slf4j
 public class ChatController {
 
     @Autowired
     private MessageRepo messageRepo;
 
+    @KafkaListener(topics = "friendship-topic", errorHandler = "customKafkaListenerErrorHandler")
+    public void getCurrencyData(ConsumerRecord<String, KafkaFriendshipMessage> record) {
+        try {
+            KafkaFriendshipMessage exchange = record.value();
+            log.info(exchange.toString());
+        } catch (Exception e) {
+            log.error("Ошибка при обработке сообщения Kafka: {}", e.getMessage());
+        }
+    }
 
+    @CrossOrigin(origins = "*")
     @GetMapping("/chat/history/messages")
     public ResponseEntity<List<Message>> getMessages(HttpServletRequest request,
                                                      @RequestParam(name = "senderId", required = true) String senderId,

@@ -77,7 +77,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>-org.example.P2PChatApplication</mainClass>
+                    <mainClass>org.example.P2PChatApplication</mainClass>
                 </configuration>
                 <executions>
                     <execution>
