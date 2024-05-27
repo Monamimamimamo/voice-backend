@@ -106,9 +106,6 @@ services:
       - "8081:8081"
     depends_on:
       - friendship-manager
-    volumes:
-      - ../root:/home/app/.microsoft/usersecrets:ro
-      - ../root:/home/app/.aspnet/https:ro
 
 
   db:

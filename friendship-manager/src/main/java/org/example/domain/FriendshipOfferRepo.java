@@ -19,6 +19,4 @@ public interface FriendshipOfferRepo extends JpaRepository<FriendshipOffer, Long
 
     @Query("SELECT f FROM FriendshipOffer f WHERE f.sender = :senderId AND f.receiver = :receiverId ORDER BY f.id ASC")
     FriendshipOffer findFirstBySenderAndReceiver(@Param("senderId") String senderId, @Param("receiverId") String receiverId);
-
-
 }
