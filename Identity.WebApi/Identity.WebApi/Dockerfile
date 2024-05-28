@@ -22,4 +22,5 @@ RUN dotnet publish "./Identity.WebApi.csproj" -c $BUILD_CONFIGURATION -o /app/pu
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+COPY Identity.WebApi/keystore.jks /app/keystore.jks
 ENTRYPOINT ["dotnet", "Identity.WebApi.dll"]
