@@ -1,5 +1,6 @@
-var socket = new SockJS('https://voice-backend.ru:8082/chat');
-var friendshipSocket = new SockJS('https://voice-backend.ru:8082/friendship');
+
+var socket = new SockJS('https://voice-backend.ru:9003/chat');
+var friendshipSocket = new SockJS('https://voice-backend.ru:9004/friendship');
 var stompClient = Stomp.over(socket);
 var friendshipClient = Stomp.over(friendshipSocket);
 

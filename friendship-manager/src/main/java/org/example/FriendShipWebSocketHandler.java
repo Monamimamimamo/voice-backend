@@ -29,44 +29,67 @@ public class FriendShipWebSocketHandler {
     private final ReplyingKafkaTemplate<String, KafkaFriendshipMessage, KafkaFriendshipMessage> replyingKafkaTemplate;
 
     @MessageMapping("/friendship/{receiverId}")
-    @SendTo("/topic/friendship/{receiverId}")
     public JSONObject handleChat(String message, @DestinationVariable("receiverId") String receiverId) throws ParseException, IOException {
         JSONObject parsedJson = (JSONObject) new JSONParser().parse(message);
         String senderId = (String) parsedJson.get("sender");
         String status = (String) parsedJson.get("status");
 
         JSONObject resultJson = new JSONObject();
+
+        FriendshipOffer existingOffer = friendshipOfferRepo.findFirstBySenderAndReceiver(senderId, receiverId);
+        if (existingOffer!= null && Objects.equals(existingOffer.getStatus(), "pending")) {
+            resultJson = new JSONObject();
+            resultJson.put("error", "Вам уже отправляли такой запрос на дружбу");
+            return resultJson;
+        }
+
         LocalDateTime time = LocalDateTime.now();
         resultJson.put("timestamp", time);
         resultJson.put("sender", senderId);
         resultJson.put("receiver", receiverId);
         resultJson.put("status", status);
 
+        existingOffer = friendshipOfferRepo.findFirstBySenderAndReceiver(receiverId, senderId);
         FriendshipOffer friendshipOffer = new FriendshipOffer();
-        if (Objects.equals(status, "pending")){
-            friendshipOffer.setTimestamp(time);
-            friendshipOffer.setSender(senderId);
-            friendshipOffer.setReceiver(receiverId);
-            friendshipOffer.setStatus(status);
-        } else if (Objects.equals(status, "accepted")) {
-            friendshipOffer = friendshipOfferRepo.findFirstBySenderAndReceiver(receiverId, senderId);
-            if(Objects.equals(friendshipOffer.getStatus(), "pending")){
+        switch (status){
+            case "pending":
+                if (existingOffer!= null && Objects.equals(existingOffer.getStatus(), "pending")) {
+                    resultJson = new JSONObject();
+                    resultJson.put("error", "Вы уже отправляли такой запрос на дружбу");
+                    return resultJson;
+                }
+                friendshipOffer.setTimestamp(time);
+                friendshipOffer.setSender(senderId);
+                friendshipOffer.setReceiver(receiverId);
                 friendshipOffer.setStatus(status);
-            }
-            KafkaFriendshipMessage kafkaFriendshipMessage = new KafkaFriendshipMessage();
-            kafkaFriendshipMessage.setReceiver(receiverId);
-            kafkaFriendshipMessage.setSender(senderId);
-            ProducerRecord<String, KafkaFriendshipMessage> record = new ProducerRecord<>("friendship-topic", kafkaFriendshipMessage);
-            replyingKafkaTemplate.send(record);
-            System.out.println("Отправлено: " + record);
-        } else if (Objects.equals(status, "refused")) {
-            friendshipOffer = friendshipOfferRepo.findFirstBySenderAndReceiver(receiverId, senderId);
-            if(Objects.equals(friendshipOffer.getStatus(), "pending")){
-                friendshipOffer.setStatus(status);
-            }
+            case "accepted":
+                if (existingOffer!= null && Objects.equals(existingOffer.getStatus(), "accepted")) {
+                    resultJson = new JSONObject();
+                    resultJson.put("error", "Вы уже приняли запрос на дружбу");
+                    return resultJson;
+                }
+                friendshipOffer = friendshipOfferRepo.findFirstBySenderAndReceiver(receiverId, senderId);
+                if(Objects.equals(friendshipOffer.getStatus(), "pending")){
+                    friendshipOffer.setStatus(status);
+                }
+                KafkaFriendshipMessage kafkaFriendshipMessage = new KafkaFriendshipMessage();
+                kafkaFriendshipMessage.setReceiver(receiverId);
+                kafkaFriendshipMessage.setSender(senderId);
+                ProducerRecord<String, KafkaFriendshipMessage> record = new ProducerRecord<>("friendship-topic", kafkaFriendshipMessage);
+                replyingKafkaTemplate.send(record);
+                System.out.println("Отправлено: " + record);
+            case "refused":
+                if (existingOffer!= null && Objects.equals(existingOffer.getStatus(), "accepted")) {
+                    resultJson = new JSONObject();
+                    resultJson.put("error", "Вы уже отказались от запроса на дружбу");
+                    return resultJson;
+                }
+                friendshipOffer = friendshipOfferRepo.findFirstBySenderAndReceiver(receiverId, senderId);
+                if(Objects.equals(friendshipOffer.getStatus(), "pending")){
+                    friendshipOffer.setStatus(status);
+                }
         }
         friendshipOfferRepo.save(friendshipOffer);
-        System.out.println("Сохранено: " + friendshipOffer);
         return resultJson;
     }
 }

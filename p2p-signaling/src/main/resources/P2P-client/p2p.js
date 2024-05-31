@@ -2,7 +2,7 @@
 const messages = document.getElementById('messages');
 
 let stompClient = null;
-const socket = new SockJS('https://voice-backend.ru:8082/signaling');
+const socket = new SockJS('https://voice-backend.ru:9000/signaling');
 stompClient = Stomp.over(socket);
 
 let answerSent = false;

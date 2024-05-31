@@ -5,7 +5,7 @@ services:
     depends_on:
       - db
     environment:
-      ZOOKEEPER_CLIENT_PORT: 9000
+      ZOOKEEPER_CLIENT_PORT: 9999
       ZOOKEEPER_TICK_TIME: 2000
 
 
@@ -17,7 +17,7 @@ services:
       - "9001:9001"
     environment:
       KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:9000
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:9999
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9001
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
@@ -59,7 +59,7 @@ services:
     depends_on:
       - gateway
     ports:
-      - "9002:9002"
+      - "9000:9000"
     environment:
       - server.ssl.key-store=classpath:keystore.jks
       - server.ssl.key-store-type=JKS
@@ -106,9 +106,6 @@ services:
       - "8081:8081"
     depends_on:
       - friendship-manager
-    volumes:
-      - ../root:/home/app/.microsoft/usersecrets:ro
-      - ../root:/home/app/.aspnet/https:ro
 
 
   db:

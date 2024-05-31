@@ -38,16 +38,23 @@ public class ChatWebSocketHandler {
     public JSONObject handleChat(String message, @DestinationVariable("senderId") String senderId, @DestinationVariable("receiverId") String receiverId) throws ParseException, IOException {
         JSONObject parsedJson = (JSONObject) new JSONParser().parse(message);
         String content = (String) parsedJson.get("content");
-        JSONObject resultJson = new JSONObject();
-        resultJson.put("content", content);
 
         Message db_message = new Message();
         db_message.setContent(content);
         db_message.setTimestamp(LocalDateTime.now());
         db_message.setSender(senderId);
         db_message.setReceiver(receiverId);
-        messageRepo.save(db_message);
-        
+        Message savedMessage = messageRepo.save(db_message);
+
+
+        JSONObject resultJson = new JSONObject();
+
+        // Добавляем информацию о сообщении в resultJson
+        resultJson.put("id", savedMessage.getId()); // Текст сообщения
+        resultJson.put("content", content); // Текст сообщения
+        resultJson.put("timestamp", LocalDateTime.now()); // Временная метка отправки
+        resultJson.put("sender", senderId); // Идентификатор отправителя
+        resultJson.put("receiver", receiverId); // Идентификатор получателя
         return resultJson;
     }
 }

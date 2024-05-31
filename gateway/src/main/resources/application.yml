@@ -1,9 +1,5 @@
 server:
   port: 8082
-  ssl:
-    key-store: classpath:keystore.jks
-    key-store-password: aA258007195
-    key-store-type: JKS
 
 spring:
   application:
@@ -15,6 +11,11 @@ spring:
           uri: https://p2p-chat:9003
           predicates:
             - Path=/chat/**
+        - id: swagger_ui_route
+          uri: http://identity.webapi:8080
+          predicates:
+            - Path=/swagger/**
+            - Path=/api/**
         - id: groupCall_route
           uri: wss://kurento-group-call:8443
           predicates:
