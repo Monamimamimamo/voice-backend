@@ -35,7 +35,9 @@ public class FriendshipWebSocketService {
 
     public JSONObject handleFriendshipMessage(String receiverId, String senderJwt, String status){
         String senderId = authService.getNameFromAuthToken(senderJwt);
-        FriendshipOffer existingOffer = friendshipOfferRepo.findBySenderAndReceiver(senderId, receiverId).orElse(null);
+        log.info("sender: " + senderId);
+        log.info("receiver: " + receiverId);
+        FriendshipOffer existingOffer = friendshipOfferRepo.findBySenderAndReceiver(senderId, receiverId).orElse(friendshipOfferRepo.findByReceiverAndSender(senderId, receiverId).orElse(null));
         LocalDateTime time = LocalDateTime.now();
         return switch (status) {
             case "pending" -> handlePendingStatus(existingOffer, senderId, receiverId, time);

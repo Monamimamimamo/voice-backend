@@ -18,7 +18,7 @@ public class AuthService {
                 .setSigningKey(secretKey.getBytes())
                 .parseClaimsJws(token)
                 .getBody();
-        String userName = claims.get("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress", String.class);
+        String userName = claims.get("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name", String.class);
         log.info("Имя пользователя: " + userName);
         return userName;
     }

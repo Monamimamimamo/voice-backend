@@ -23,7 +23,8 @@ public class FriendshipController {
     private final FriendshipService friendshipService;
     private final AuthService authService;
 
-    @GetMapping("/{type}")
+    @CrossOrigin("*")
+    @GetMapping("/history/{type}")
     public ResponseEntity<List<FriendshipOffer>> getOffers(
             @PathVariable String type,
             HttpServletRequest request,
