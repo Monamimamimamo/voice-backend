@@ -2,6 +2,7 @@ package org.example;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import jakarta.transaction.Transactional;
 import org.example.domain.Message;
 import org.example.domain.MessageRepo;
 import org.json.simple.JSONObject;
@@ -33,6 +34,7 @@ public class ChatWebSocketHandler {
     private MessageRepo messageRepo;
 
 
+    @Transactional
     @MessageMapping("/chat/{senderId}/{receiverId}")
     @SendTo("/topic/chat/{senderId}/{receiverId}")
     public JSONObject handleChat(String message, @DestinationVariable("senderId") String senderId, @DestinationVariable("receiverId") String receiverId) throws ParseException, IOException {
@@ -49,12 +51,11 @@ public class ChatWebSocketHandler {
 
         JSONObject resultJson = new JSONObject();
 
-        // Добавляем информацию о сообщении в resultJson
-        resultJson.put("id", savedMessage.getId()); // Текст сообщения
-        resultJson.put("content", content); // Текст сообщения
-        resultJson.put("timestamp", LocalDateTime.now()); // Временная метка отправки
-        resultJson.put("sender", senderId); // Идентификатор отправителя
-        resultJson.put("receiver", receiverId); // Идентификатор получателя
+        resultJson.put("id", savedMessage.getId());
+        resultJson.put("content", content);
+        resultJson.put("timestamp", LocalDateTime.now());
+        resultJson.put("sender", senderId);
+        resultJson.put("receiver", receiverId);
         return resultJson;
     }
 }

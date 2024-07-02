@@ -1,5 +1,6 @@
 package org.example.domain;
 
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -14,5 +15,6 @@ public interface MessageRepo extends JpaRepository<Message, Long> {
             " OR " +
             "(m.sender = :receiverId) AND (m.receiver = :senderId) " +
             "ORDER BY m.timestamp DESC")
+    @Transactional
     List<Message> findMessagesBySenderOrReceiver(@Param("senderId") String senderId, @Param("receiverId") String receiverId, Pageable pageable);
 }

@@ -21,18 +21,6 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9001
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
-
-  messages-db:
-    image: postgres:latest
-    depends_on:
-      - kafka
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 123
-      POSTGRES_DB: p2p_chat
-    ports:
-      - "5430:5432"
-
   friendship-offers-db:
     image: postgres:latest
     depends_on:
@@ -79,8 +67,20 @@ services:
       server.ssl.key-store-password: aA258007195
       spring.kafka.bootstrap-servers: kafka:9001
 
+
+  messages-db:
+    image: postgres:latest
+    depends_on:
+      - kafka
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: p2p_chat
+    ports:
+      - "5430:5432"
+
   friendship-manager:
-    image: monamimamimamo/friendship-manager:1.0
+    image: monamimamimamo/friendship-manager:1.1
     depends_on:
       - gateway
       - friendship-offers-db
@@ -88,24 +88,29 @@ services:
       - "9004:9004"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://friendship-offers-db:5432/friendship_manager
-      server.ssl.key-store: classpath:keystore.jks
-      server.ssl.key-store-type: JKS
-      server.ssl.key-store-password: aA258007195
+      #server.ssl.key-store: classpath:keystore.jks
+      #server.ssl.key-store-type: JKS
+      #server.ssl.key-store-password: aA258007195
       spring.kafka.bootstrap-servers: kafka:9001
 
 
-  identity.webapi:
-    image: monamimamimamo/identitywebapi
+
+  identityapi:
+    image: sunbros/identityapi
+    depends_on:
+      - db
     environment:
       - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=UserTest;Username=postgres;Password=qe13zc24680
       - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/home/app/.aspnet/https/aspnetapp.pfx
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=aA258007195
       - ASPNETCORE_HTTP_PORTS=8080
       - ASPNETCORE_HTTPS_PORTS=8081
+    volumes:
+      - ./aspnetapp.pfx:/home/app/.aspnet/https/aspnetapp.pfx:ro
     ports:
       - "8080:8080"
       - "8081:8081"
-    depends_on:
-      - friendship-manager
 
 
   db:

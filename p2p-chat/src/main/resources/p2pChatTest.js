@@ -1,5 +1,5 @@
 var socket = new SockJS('https://voice-backend.ru:9003/chat');
-var friendshipSocket = new SockJS('https://voice-backend.ru:9004/friendship');
+var friendshipSocket = new SockJS('http://localhost:9004/friendship');
 var stompClient = Stomp.over(socket);
 var friendshipClient = Stomp.over(friendshipSocket);
 
@@ -79,7 +79,6 @@ function sendFriendRequest() {
         friendshipClient.send(`/app/friendship/${userId2}`, {}, JSON.stringify({
             'timestamp': timestamp,
             'sender': userId1,
-            'receiver': userId2,
             'status': 'pending'
         }));
     } else {
@@ -112,7 +111,6 @@ function handleAcceptFriendRequest(message) {
     friendshipClient.send(`/app/friendship/${userId2}`, {}, JSON.stringify({
         'timestamp': new Date().getTime(), // Генерируем текущее время в миллисекундах
         'sender': userId1,
-        'receiver': userId2,
         'status': 'accepted'
     }));
 }
