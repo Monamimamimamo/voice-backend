@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.header.internals.RecordHeader;
 import org.example.domain.FriendshipOffer;
 import org.example.domain.FriendshipOfferRepo;
 import org.example.domain.KafkaFriendshipRequest;
@@ -13,6 +14,7 @@ import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.requestreply.ReplyingKafkaTemplate;
 import org.springframework.kafka.requestreply.RequestReplyFuture;
+import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -136,11 +138,12 @@ public class FriendshipWebSocketService {
     }
 
     public boolean sendKafkaMessage(String receiverId, String senderId, String type) throws ExecutionException, InterruptedException {
-        KafkaFriendshipRequest KafkaFriendshipRequest = new KafkaFriendshipRequest(type, receiverId, senderId);
-        ProducerRecord<String, KafkaFriendshipRequest> record = new ProducerRecord<>("friendship-topic", KafkaFriendshipRequest);
+        KafkaFriendshipRequest request = new KafkaFriendshipRequest(type, receiverId, senderId);
+        ProducerRecord<String, KafkaFriendshipRequest> record = new ProducerRecord<>("friendship-request-topic", receiverId, request);
+        record.headers().add(new RecordHeader(KafkaHeaders.REPLY_TOPIC, "friendship-response-topic".getBytes()));
         log.info("Отправлен объект: " + record);
         RequestReplyFuture<String, KafkaFriendshipRequest, KafkaFriendshipResponse> futureResponse = replyingKafkaTemplate.sendAndReceive(record);
-        log.info("Получен объект: " + futureResponse.toString());
+        log.info("Получен объект: " + futureResponse.get().value());
         KafkaFriendshipResponse response = futureResponse.get().value();
         return Objects.equals(response.getStatus(), "completed");
     }

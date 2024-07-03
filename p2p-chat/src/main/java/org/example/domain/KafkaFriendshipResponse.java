@@ -7,4 +7,5 @@ import lombok.Data;
 @AllArgsConstructor
 public class KafkaFriendshipResponse {
     private String status;
+
 }

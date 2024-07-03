@@ -11,15 +11,7 @@ spring:
       ddl-auto: update
   kafka:
     bootstrap-servers: localhost:9092
-    consumer:
-      group-id: my-group-id
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-      properties:
-        spring:
-          json:
-            value:
-              default:
-                type: org.example.domain.KafkaFriendshipMessage
+
 
 server:
   port: 9003
