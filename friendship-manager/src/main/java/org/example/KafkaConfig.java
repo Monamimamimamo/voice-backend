@@ -3,7 +3,8 @@ package org.example;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.example.domain.KafkaFriendshipMessage;
+import org.example.domain.KafkaFriendshipRequest;
+import org.example.domain.KafkaFriendshipResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.*;
@@ -20,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 @Configuration
-public class KafkaProducer {
+public class KafkaConfig  {
 
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
@@ -28,7 +29,7 @@ public class KafkaProducer {
 
 
     @Bean
-    public ProducerFactory<String, KafkaFriendshipMessage> producerFactory() {
+    public ProducerFactory<String, KafkaFriendshipRequest> producerFactory() {
         Map<String, Object> configProps = new HashMap<>();
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
@@ -38,11 +39,11 @@ public class KafkaProducer {
 
 
     @Bean
-    public ReplyingKafkaTemplate<String, KafkaFriendshipMessage, KafkaFriendshipMessage> replyingKafkaTemplate(
-            ProducerFactory<String, KafkaFriendshipMessage> pf,
-            ConcurrentKafkaListenerContainerFactory<String, KafkaFriendshipMessage> factory) {
+    public ReplyingKafkaTemplate<String, KafkaFriendshipRequest, KafkaFriendshipResponse> replyingKafkaTemplate(
+            ProducerFactory<String, KafkaFriendshipRequest> pf,
+            ConcurrentKafkaListenerContainerFactory<String, KafkaFriendshipResponse> factory) {
 
-        ConcurrentMessageListenerContainer<String, KafkaFriendshipMessage> repliesContainer = factory.createContainer("friendship-topic");
+        ConcurrentMessageListenerContainer<String, KafkaFriendshipResponse> repliesContainer = factory.createContainer("friendship-topic");
         repliesContainer.getContainerProperties().setGroupId("group_id");
         repliesContainer.setAutoStartup(false);
         return new ReplyingKafkaTemplate<>(pf, repliesContainer);

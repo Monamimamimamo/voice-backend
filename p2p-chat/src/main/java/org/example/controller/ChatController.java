@@ -3,7 +3,9 @@ package org.example.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.example.domain.KafkaFriendshipMessage;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.example.domain.KafkaFriendshipRequest;
+import org.example.domain.KafkaFriendshipResponse;
 import org.springframework.http.HttpHeaders;
 import org.example.domain.Message;
 import org.example.domain.MessageRepo;
@@ -13,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,12 +30,17 @@ public class ChatController {
 
     @Autowired
     private MessageRepo messageRepo;
+    @Autowired
+    private KafkaTemplate<String, KafkaFriendshipResponse> kafkaTemplate;
 
     @KafkaListener(topics = "friendship-topic", errorHandler = "customKafkaListenerErrorHandler")
-    public void getCurrencyData(ConsumerRecord<String, KafkaFriendshipMessage> record) {
+    public void getCurrencyData(ConsumerRecord<String, KafkaFriendshipRequest> record) {
         try {
-            KafkaFriendshipMessage exchange = record.value();
+            KafkaFriendshipRequest exchange = record.value();
             log.info(exchange.toString());
+            KafkaFriendshipResponse response = new KafkaFriendshipResponse("completed");
+            kafkaTemplate.send(new ProducerRecord<>("friendship-topic", response));
+            log.info("Отправлено: " + response.toString());
         } catch (Exception e) {
             log.error("Ошибка при обработке сообщения Kafka: {}", e.getMessage());
         }

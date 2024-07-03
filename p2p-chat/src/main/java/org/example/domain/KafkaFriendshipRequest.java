@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor(force = true)
-public class KafkaFriendshipMessage {
+public class KafkaFriendshipRequest {
     private String type;
     private String receiver;
     private String sender;

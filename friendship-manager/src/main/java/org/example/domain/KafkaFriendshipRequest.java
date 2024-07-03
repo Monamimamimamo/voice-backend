@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
-public class KafkaFriendshipMessage {
+public class KafkaFriendshipRequest {
     private String type;
     private String receiver;
     private String sender;

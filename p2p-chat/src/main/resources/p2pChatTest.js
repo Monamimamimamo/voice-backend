@@ -1,20 +1,18 @@
-var socket = new SockJS('https://voice-backend.ru:9003/chat');
+
 var friendshipSocket = new SockJS('http://localhost:9004/friendship');
-var stompClient = Stomp.over(socket);
 var friendshipClient = Stomp.over(friendshipSocket);
 
 
 const headers = {
-    Authorization: 'Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9lbWFpbGFkZHJlc3MiOiJTaHVrc2hpbm1ha3NpbS5ydUBtYWlsLnJ1IiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6IlNodWtzaGlubWFrc2ltLnJ1QG1haWwucnUiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBZG1pbiIsImV4cCI6MTcxNjIzMTM3MCwiaXNzIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NzI2NiIsImF1ZCI6Imh0dHBzOi8vbG9jYWxob3N0OjcyNjYifQ.gl6KyviYyB8hNAQ5fjZ_vGjlR8w4koJjfqHumoSw5m8",
+    Authorization: 'Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9lbWFpbGFkZHJlc3MiOiJraXJpbGw2NjZAeWFuZGV4LnJ1IiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6IktpcmEiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBRE1JTiIsImV4cCI6MTcxOTkxOTg5NSwiaXNzIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NzI2NiIsImF1ZCI6Imh0dHBzOi8vbG9jYWxob3N0OjcyNjYifQ.Bz9wUmgT7UHlP2Jmf1CqQ1eXv2EOeOXWxpfSPB6IZ5o",
 };
+const auth1 = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9lbWFpbGFkZHJlc3MiOiJraXJpbGw2NjZAeWFuZGV4LnJ1IiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6IktpcmEiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBRE1JTiIsImV4cCI6MTcxOTkyNjcwNCwiaXNzIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NzI2NiIsImF1ZCI6Imh0dHBzOi8vbG9jYWxob3N0OjcyNjYifQ.vdQ-7c8FhxE5UBJZUANM2obfOOD-tlpXYhwiYgazBDA";
+const auth2 = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9lbWFpbGFkZHJlc3MiOiJraXJpbGw2NjMxMjM2QHlhbmRleC5ydSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWUiOiJNaXNoYSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkFETUlOIiwiZXhwIjoxNzE5OTI2NjQxLCJpc3MiOiJodHRwczovL2xvY2FsaG9zdDo3MjY2IiwiYXVkIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NzI2NiJ9.z2OXipMKKvnDTOl7kDYm8mTEpcyZ5sEciWzPTxrKBuQ";
+const name1 = "Kira";
+const name2 = "Misha";
 
 // Функция для подключения к серверу
 function connect() {
-    if (!stompClient.connected) {
-        stompClient.connect(headers, function(frame) {
-            console.log('Connected: ' + frame);
-        });
-    }
         if (!friendshipClient.connected) {
             friendshipClient.connect(headers, function(frame) {
                 console.log('Connected: ' + frame);
@@ -29,18 +27,14 @@ function subscribeToChannel() {
     var userId2 = document.getElementById('userId2').value.trim();
 
     if (userId1 && userId2) {
-        subscribe(userId1, userId2);
+        subscribe(userId1);
     } else {
         alert("Пожалуйста, введите оба ID.");
     }
 }
 
 // Функция для подписки на конкретный канал
-function subscribe(userId1, userId2) {
-    stompClient.subscribe(`/topic/chat/${userId2}/${userId1}`, function(messageOutput) {
-        var message = JSON.parse(messageOutput.body);
-        displayMessage(message);
-    });
+function subscribe(userId1) {
 
     friendshipClient.subscribe(`/topic/friendship/${userId1}`, function(friendshipMessage) {
         var message = JSON.parse(friendshipMessage.body);
@@ -48,17 +42,7 @@ function subscribe(userId1, userId2) {
     });
 }
 
-// Функция для отправки сообщения
-function sendMessage(event) {
-    event.preventDefault();
-    var messageInputDom = document.getElementById('messageInput');
-    var message = messageInputDom.value;
 
-    var userId1 = document.getElementById('userId1').value;
-    var userId2 = document.getElementById('userId2').value;
-    stompClient.send(`/app/chat/${userId1}/${userId2}`, {}, JSON.stringify({'content': message}));
-    messageInputDom.value = '';
-}
 
 // Функция для отображения сообщения
 function displayMessage(message) {
@@ -69,16 +53,15 @@ function displayMessage(message) {
 }
 
 function sendFriendRequest() {
-    var userId1 = document.getElementById('userId1').value.trim();
     var userId2 = document.getElementById('userId2').value.trim();
 
-    if (userId1 && userId2) {
+    if (userId2) {
 
         // Отправляем сообщение с запросом дружбы
         var timestamp = new Date().getTime(); // Генерируем текущее время в миллисекундах
         friendshipClient.send(`/app/friendship/${userId2}`, {}, JSON.stringify({
             'timestamp': timestamp,
-            'sender': userId1,
+            'sender': auth2,
             'status': 'pending'
         }));
     } else {
@@ -104,13 +87,12 @@ function displayFriendshipMessage(message) {
 }
 
 function handleAcceptFriendRequest(message) {
-    var userId1 = document.getElementById('userId1').value;
     var userId2 = document.getElementById('userId2').value;
 
     // Отправляем сообщение с подтверждением дружбы
     friendshipClient.send(`/app/friendship/${userId2}`, {}, JSON.stringify({
-        'timestamp': new Date().getTime(), // Генерируем текущее время в миллисекундах
-        'sender': userId1,
+        'timestamp': new Date().getTime(),
+        'sender': auth2,
         'status': 'accepted'
     }));
 }

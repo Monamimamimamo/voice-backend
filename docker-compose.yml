@@ -80,7 +80,7 @@ services:
       - "5430:5432"
 
   friendship-manager:
-    image: monamimamimamo/friendship-manager:1.1
+    image: monamimamimamo/friendship-manager:1.2
     depends_on:
       - gateway
       - friendship-offers-db

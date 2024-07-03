@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -27,7 +29,17 @@ public class FriendshipService {
 
     public List<FriendshipOffer> getOffersByTypeAndBelonging(String receiverId, String type, String belonging) {
         validateType(type);
-        return getOffers(receiverId, type, belonging);
+        List<FriendshipOffer> offers = getOffers(receiverId, type, belonging);
+        if ("accepted".equals(type) || "refused".equals(type)) {
+            List<UUID> idsToDelete = offers.stream()
+                    .map(FriendshipOffer::getId)
+                    .collect(Collectors.toList());
+            friendshipOfferRepo.deleteAllById(idsToDelete);
+            log.info("Удалены записи: " + offers.toString());
+        }
+
+        log.info("Возвращены записи: " + offers.toString());
+        return offers;
     }
 
     public void validateType(String type) throws IllegalArgumentException {
