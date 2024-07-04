@@ -1,5 +1,11 @@
 package org.example.controller;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.service.FriendshipWebSocketService;
@@ -16,6 +22,7 @@ import java.util.concurrent.ExecutionException;
 @RestController
 @AllArgsConstructor
 @Slf4j
+@OpenAPIDefinition(info = @Info(title = "Friendship-Management API"))
 public class FriendShipWebSocketController {
 
     private final FriendshipWebSocketService friendshipWebSocketService;
@@ -28,4 +35,5 @@ public class FriendShipWebSocketController {
         log.info("Принято сообщение: " + message);
         return friendshipWebSocketService.handleFriendshipMessage(receiverId, senderJwt, status);
     }
+
 }

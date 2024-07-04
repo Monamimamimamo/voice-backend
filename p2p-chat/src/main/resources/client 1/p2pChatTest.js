@@ -4,10 +4,9 @@ var friendshipClient = Stomp.over(friendshipSocket);
 
 
 const headers = {
-    Authorization: 'Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9lbWFpbGFkZHJlc3MiOiJraXJpbGw2NjZAeWFuZGV4LnJ1IiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6IktpcmEiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBRE1JTiIsImV4cCI6MTcxOTkxOTg5NSwiaXNzIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NzI2NiIsImF1ZCI6Imh0dHBzOi8vbG9jYWxob3N0OjcyNjYifQ.Bz9wUmgT7UHlP2Jmf1CqQ1eXv2EOeOXWxpfSPB6IZ5o",
+    Authorization: 'Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9lbWFpbGFkZHJlc3MiOiJraXJpbGw2NjZAeWFuZGV4LnJ1IiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6IktpcmEiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBRE1JTiIsImV4cCI6MTcyMDAzMTM5MywiaXNzIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NzI2NiIsImF1ZCI6Imh0dHBzOi8vbG9jYWxob3N0OjcyNjYifQ.WpMN-Plg1q--SQT_R1XRJ_ml1zv8hI-ozsZKxYCUMNQ",
 };
-const auth1 = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9lbWFpbGFkZHJlc3MiOiJraXJpbGw2NjZAeWFuZGV4LnJ1IiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6IktpcmEiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBRE1JTiIsImV4cCI6MTcyMDAxNTgwNSwiaXNzIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NzI2NiIsImF1ZCI6Imh0dHBzOi8vbG9jYWxob3N0OjcyNjYifQ.mDfj_oHcWB_-IcF8BWvcSiXFpY41ZS05au-UvsGzVvE";
-const name = "Kira"
+
 
 // Функция для подключения к серверу
 function connect() {
@@ -59,7 +58,7 @@ function sendFriendRequest() {
         var timestamp = new Date().getTime(); // Генерируем текущее время в миллисекундах
         friendshipClient.send(`/app/friendship/${userId2}`, {}, JSON.stringify({
             'timestamp': timestamp,
-            'sender': auth1,
+            'sender': headers.Authorization,
             'status': 'pending'
         }));
     } else {
@@ -99,7 +98,7 @@ function handleAcceptFriendRequest(message) {
     // Отправляем сообщение с подтверждением дружбы
     friendshipClient.send(`/app/friendship/${userId2}`, {}, JSON.stringify({
         'timestamp': new Date().getTime(),
-        'sender': auth1, // Убедитесь, что переменная auth2 содержит правильные данные пользователя
+        'sender': headers.Authorization, // Убедитесь, что переменная auth2 содержит правильные данные пользователя
         'status': 'accepted'
     }));
 }
@@ -110,7 +109,7 @@ function handleRefuseFriendRequest(message) {
     // Отправляем сообщение с отказом в дружбу
     friendshipClient.send(`/app/friendship/${userId2}`, {}, JSON.stringify({
         'timestamp': new Date().getTime(),
-        'sender': auth1, // Убедитесь, что переменная auth2 содержит правильные данные пользователя
+        'sender': headers.Authorization, // Убедитесь, что переменная auth2 содержит правильные данные пользователя
         'status': 'refused'
     }));
 }
