@@ -9,14 +9,17 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.domain.FriendshipOffer;
+import org.example.domain.FriendshipOfferRepo;
 import org.example.service.AuthService;
 import org.example.service.FriendshipService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -27,6 +30,12 @@ public class FriendshipController {
 
     private final FriendshipService friendshipService;
     private final AuthService authService;
+
+    @Scheduled(cron = "0 0 0 * * ?")
+    public void deleteOldFriendshipOffers() {
+        LocalDateTime timeAgo = LocalDateTime.now().minusMonths(1);
+        friendshipService.deleteByTimestampBefore(timeAgo);
+    }
 
 
     @CrossOrigin("*")

@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -25,6 +26,12 @@ public class FriendshipService {
     @Autowired
     public FriendshipService(FriendshipOfferRepo friendshipOfferRepo) {
         this.friendshipOfferRepo = friendshipOfferRepo;
+    }
+
+    public void deleteByTimestampBefore(LocalDateTime timestamp) {
+        List<FriendshipOffer> result = friendshipOfferRepo.findByTimestampBefore(timestamp);
+        log.info("Удалены записи: " + result.toString());
+        friendshipOfferRepo.deleteAll(result);
     }
 
     public List<FriendshipOffer> getOffersByTypeAndBelonging(String receiverId, String type, String belonging) {
@@ -56,4 +63,5 @@ public class FriendshipService {
             default -> throw new IllegalStateException("Unexpected value: " + belonging);
         };
     }
+
 }
