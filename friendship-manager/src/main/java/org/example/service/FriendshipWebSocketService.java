@@ -139,7 +139,7 @@ public class FriendshipWebSocketService {
 
     public boolean sendKafkaMessage(String receiverId, String senderId, String type) throws ExecutionException, InterruptedException {
         KafkaFriendshipRequest request = new KafkaFriendshipRequest(type, receiverId, senderId);
-        ProducerRecord<String, KafkaFriendshipRequest> record = new ProducerRecord<>("friendship-request-topic", receiverId, request);
+        ProducerRecord<String, KafkaFriendshipRequest> record = new ProducerRecord<>("friendship-request-topic", request);
         record.headers().add(new RecordHeader(KafkaHeaders.REPLY_TOPIC, "friendship-response-topic".getBytes()));
         log.info("Отправлен объект: " + record);
         RequestReplyFuture<String, KafkaFriendshipRequest, KafkaFriendshipResponse> futureResponse = replyingKafkaTemplate.sendAndReceive(record);

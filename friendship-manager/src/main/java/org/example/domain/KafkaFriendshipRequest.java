@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class KafkaFriendshipRequest {
     private String type;
-    private String receiver;
-    private String sender;
+    private String user;
+    private String friend;
 }
 
 

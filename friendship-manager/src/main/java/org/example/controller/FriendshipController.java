@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 @AllArgsConstructor
@@ -37,13 +38,27 @@ public class FriendshipController {
         friendshipService.deleteByTimestampBefore(timeAgo);
     }
 
+    @CrossOrigin("*")
+    @PostMapping("/remove/{friend}")
+    @Operation(summary = "Удаление пользователя из списка друзей",
+            parameters = {@Parameter(in = ParameterIn.HEADER, name = HttpHeaders.AUTHORIZATION, required = true, description = "JWT Bearer токен для хэдэра авторизации")})
+    public ResponseEntity<String> removeFromFriends(@Parameter (description = "Логин удаляемого пользователя") @PathVariable String friend,
+                                                    HttpServletRequest request) throws ExecutionException, InterruptedException {
+        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if (authHeader == null ||!authHeader.startsWith("Bearer ")) {
+            log.error("Unauthorized request");
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        String userName = authService.getNameFromAuthToken(authHeader);
+        return ResponseEntity.ok(friendshipService.deleteFromFriends("remove" ,userName, friend));
+    }
+
 
     @CrossOrigin("*")
     @GetMapping("/history/{type}")
-    @Operation(summary = """
-            Получение истории предложений дружбы ****
-            при отправке запросе accepted или refused предложений ОНИ БУДУТ СТИРАТЬСЯ ИЗ БД ****
-            это нужно чтоб бд не засорялось, пользователь один раз чекает принятые и отклонённые приглосы и их история стирается""",
+    @Operation(summary = "Получение истории предложений дружбы", description = """
+            При отправке запросе accepted или refused предложений ОНИ БУДУТ СТИРАТЬСЯ ИЗ БД ****
+            это нужно чтобы бд не засорялось, пользователь один раз чекает принятые и отклонённые приглосы и их история стирается""",
             parameters = {
                     @Parameter(in = ParameterIn.HEADER, name = HttpHeaders.AUTHORIZATION, required = true, description = "JWT Bearer токен для хэдэра авторизации"),
             })
