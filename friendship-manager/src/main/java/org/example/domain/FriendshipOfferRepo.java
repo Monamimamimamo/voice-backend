@@ -18,8 +18,9 @@ public interface FriendshipOfferRepo extends JpaRepository<FriendshipOffer, UUID
 
 
 
-    @Query("SELECT f FROM FriendshipOffer f WHERE f.timestamp < :timestamp")
-    List<FriendshipOffer> findByTimestampBefore(@Param("timestamp") LocalDateTime timestamp);
+    @Query("DELETE FROM FriendshipOffer fo WHERE fo.timestamp < :timestamp")
+    void deleteByTimestampBefore(@Param("timestamp") LocalDateTime timestamp);
+
 
 
     @Query(value = "SELECT * " +

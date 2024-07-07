@@ -1,6 +1,6 @@
-package org.example;
+package org.example.config;
 
-import org.example.common.MissingAuthorizationTokenException;
+import org.example.common.exeption.MissingAuthorizationTokenException;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;

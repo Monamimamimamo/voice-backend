@@ -1,26 +1,17 @@
 package org.example.service;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.header.internals.RecordHeader;
+import org.example.common.service.KafkaService;
 import org.example.domain.FriendshipOffer;
 import org.example.domain.FriendshipOfferRepo;
-import org.example.domain.KafkaFriendshipRequest;
-import org.example.domain.KafkaFriendshipResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.kafka.requestreply.ReplyingKafkaTemplate;
-import org.springframework.kafka.requestreply.RequestReplyFuture;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
@@ -31,24 +22,15 @@ import java.util.stream.Collectors;
 public class FriendshipService {
 
     private final FriendshipOfferRepo friendshipOfferRepo;
-    private final ReplyingKafkaTemplate<String, KafkaFriendshipRequest, KafkaFriendshipResponse> replyingKafkaTemplate;
+    private final KafkaService kafkaService;
 
 
-    public String deleteFromFriends(String type,String user, String friend) throws ExecutionException, InterruptedException {
-        KafkaFriendshipRequest request = new KafkaFriendshipRequest(type, user, friend);
-        ProducerRecord<String, KafkaFriendshipRequest> record = new ProducerRecord<>("friendship-request-topic", request);
-        record.headers().add(new RecordHeader(KafkaHeaders.REPLY_TOPIC, "friendship-response-topic".getBytes()));
-        log.info("Отправлен объект: " + record);
-        RequestReplyFuture<String, KafkaFriendshipRequest, KafkaFriendshipResponse> futureResponse = replyingKafkaTemplate.sendAndReceive(record);
-        log.info("Получен объект: " + futureResponse.get().value());
-        KafkaFriendshipResponse response = futureResponse.get().value();
-        return response.getStatus();
+    public String deleteFromFriends(String user, String friend, String type) throws ExecutionException, InterruptedException {
+        return kafkaService.sendKafkaMessage(user, friend, type);
     }
 
     public void deleteByTimestampBefore(LocalDateTime timestamp) {
-        List<FriendshipOffer> result = friendshipOfferRepo.findByTimestampBefore(timestamp);
-        log.info("Удалены записи: " + result.toString());
-        friendshipOfferRepo.deleteAll(result);
+        friendshipOfferRepo.deleteByTimestampBefore(timestamp);
     }
 
     public List<FriendshipOffer> getOffersByTypeAndBelonging(String receiverId, String type, String belonging) {
@@ -59,7 +41,7 @@ public class FriendshipService {
                     .map(FriendshipOffer::getId)
                     .collect(Collectors.toList());
             friendshipOfferRepo.deleteAllById(idsToDelete);
-            log.info("Удалены записи: " + offers.toString());
+            log.info("Удалены записи: " + offers);
         }
 
         log.info("Возвращены записи: " + offers.toString());
@@ -67,9 +49,8 @@ public class FriendshipService {
     }
 
     public void validateType(String type) throws IllegalArgumentException {
-        if (!"accepted".equals(type) &&!"refused".equals(type) &&!"pending".equals(type)) {
+        if (!"accepted".equals(type) &&!"refused".equals(type) &&!"pending".equals(type))
             throw new IllegalArgumentException("Неверный тип предложения дружбы");
-        }
     }
 
 

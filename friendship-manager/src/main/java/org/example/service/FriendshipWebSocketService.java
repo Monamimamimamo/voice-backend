@@ -1,36 +1,26 @@
 package org.example.service;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.common.header.internals.RecordHeader;
+import org.example.common.service.JwtService;
+import org.example.common.service.KafkaService;
 import org.example.domain.FriendshipOffer;
 import org.example.domain.FriendshipOfferRepo;
-import org.example.domain.KafkaFriendshipRequest;
-import org.example.domain.KafkaFriendshipResponse;
 import org.json.simple.JSONObject;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.kafka.requestreply.ReplyingKafkaTemplate;
-import org.springframework.kafka.requestreply.RequestReplyFuture;
-import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 @Service
 @AllArgsConstructor
 @Slf4j
 public class FriendshipWebSocketService {
 
-    private final AuthService authService;
+    private final JwtService jwtService;
+    private final KafkaService kafkaService;
+    private final FriendshipOfferRepo friendshipOfferRepo;
 
     private static final String ERROR_MESSAGE_PENDING_ALREADY_SENT = "Вы уже отправляли такой запрос на дружбу";
     private static final String ERROR_MESSAGE_OFFER_NOT_FOUND = "Не существует такого %s запроса дружбы";
@@ -38,13 +28,9 @@ public class FriendshipWebSocketService {
     private static final String ERROR_FRIEND_LIST_DATABASE_UPDATE = "Заявка не смогла сохраниться у второго пользователя";
 
 
-    private final FriendshipOfferRepo friendshipOfferRepo;
-    private final ReplyingKafkaTemplate<String, KafkaFriendshipRequest, KafkaFriendshipResponse> replyingKafkaTemplate;
 
     public JSONObject handleFriendshipMessage(String receiverId, String senderJwt, String status) throws ExecutionException, InterruptedException {
-        String senderId = authService.getNameFromAuthToken(senderJwt);
-        log.info("sender: " + senderId);
-        log.info("receiver: " + receiverId);
+        String senderId = jwtService.getNameFromAuthToken(senderJwt);
         FriendshipOffer existingOffer = friendshipOfferRepo.findBySenderAndReceiver(senderId, receiverId).orElse(friendshipOfferRepo.findByReceiverAndSender(senderId, receiverId).orElse(null));
         LocalDateTime time = LocalDateTime.now();
         return switch (status) {
@@ -59,12 +45,7 @@ public class FriendshipWebSocketService {
     private JSONObject handlePendingStatus(FriendshipOffer existingOffer, String senderId, String receiverId, LocalDateTime time) {
         if (existingOffer!= null)
             return returnMessageError(ERROR_MESSAGE_PENDING_ALREADY_SENT);
-        existingOffer = FriendshipOffer.builder()
-                .sender(senderId)
-                .receiver(receiverId)
-                .status("pending")
-                .timestamp(time)
-                .build();
+        existingOffer = FriendshipOffer.builder().sender(senderId).receiver(receiverId).status("pending").timestamp(time).build();
         friendshipOfferRepo.save(existingOffer);
         log.info("Сохранена запись: " + existingOffer);
         return convertToJsonObject(existingOffer);
@@ -76,8 +57,8 @@ public class FriendshipWebSocketService {
         else if (existingOffer.getStatus().equals("accepted"))
             return returnMessageError(ERROR_MESSAGE_STATUS_ALREADY_SET, "accepted");
         else {
-            boolean response = sendKafkaMessage(receiverId, senderId, "accepted");
-            if (response){
+            String response = kafkaService.sendKafkaMessage(receiverId, senderId, "accepted");
+            if (Objects.equals(response, "completed")){
                 existingOffer.setTimestamp(time);
                 existingOffer.setStatus("accepted");
                 friendshipOfferRepo.save(existingOffer);
@@ -103,6 +84,7 @@ public class FriendshipWebSocketService {
         }
     }
 
+
     private JSONObject handleCheckedStatus(FriendshipOffer existingOffer, String senderId, String receiverId, LocalDateTime time) {
         if (existingOffer == null)
             return returnMessageError(ERROR_MESSAGE_OFFER_NOT_FOUND, "pending");
@@ -112,9 +94,10 @@ public class FriendshipWebSocketService {
             existingOffer.setStatus("deleted");
             return convertToJsonObject(existingOffer);
         }
-        else
-            return returnMessageError(ERROR_MESSAGE_OFFER_NOT_FOUND, "pending or refused");
+        else return returnMessageError(ERROR_MESSAGE_OFFER_NOT_FOUND, "pending or refused");
     }
+
+
 
     public JSONObject convertToJsonObject(FriendshipOffer existingOffer) {
         JSONObject jsonObject = new JSONObject();
@@ -135,16 +118,5 @@ public class FriendshipWebSocketService {
         JSONObject resultJson = new JSONObject();
         resultJson.put("error", String.format(message, type));
         return resultJson;
-    }
-
-    public boolean sendKafkaMessage(String receiverId, String senderId, String type) throws ExecutionException, InterruptedException {
-        KafkaFriendshipRequest request = new KafkaFriendshipRequest(type, receiverId, senderId);
-        ProducerRecord<String, KafkaFriendshipRequest> record = new ProducerRecord<>("friendship-request-topic", request);
-        record.headers().add(new RecordHeader(KafkaHeaders.REPLY_TOPIC, "friendship-response-topic".getBytes()));
-        log.info("Отправлен объект: " + record);
-        RequestReplyFuture<String, KafkaFriendshipRequest, KafkaFriendshipResponse> futureResponse = replyingKafkaTemplate.sendAndReceive(record);
-        log.info("Получен объект: " + futureResponse.get().value());
-        KafkaFriendshipResponse response = futureResponse.get().value();
-        return Objects.equals(response.getStatus(), "completed");
     }
 }
