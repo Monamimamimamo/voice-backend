@@ -9,9 +9,9 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
-  kafka:
-    bootstrap-servers: localhost:9092
 
+jwt:
+  secret: FBF0E5C5-056A-4DE9-A9B4-CAC04513C5D8
 
 server:
   port: 9003

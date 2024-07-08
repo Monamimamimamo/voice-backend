@@ -1,4 +1,4 @@
-package org.example.domain;
+package org.example.common.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -6,10 +6,11 @@ import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class KafkaFriendshipRequest {
+    private String sender;
+    private String receiver;
     private String type;
-    private String user;
-    private String friend;
 }
 
 
