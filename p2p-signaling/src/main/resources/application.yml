@@ -1,5 +1,8 @@
 server:
-  port: 9002
+  port: 9000
 spring:
   application:
     name: p2p-signaling
+
+jwt:
+  secret: FBF0E5C5-056A-4DE9-A9B4-CAC04513C5D8

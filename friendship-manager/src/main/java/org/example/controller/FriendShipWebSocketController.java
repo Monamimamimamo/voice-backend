@@ -2,6 +2,7 @@ package org.example.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
 import lombok.AllArgsConstructor;
@@ -27,14 +28,15 @@ public class FriendShipWebSocketController {
 
     @MessageMapping("/friendship/{receiverId}")
     public JSONObject handleFriendshipMessage(String message, @DestinationVariable("receiverId") String receiverId) throws IOException, ExecutionException, InterruptedException {
-        Map<String, Object> parsedMap = objectMapper.readValue(message, new TypeReference<>() {});
-        String senderJwt = parsedMap.getOrDefault("sender", null).toString();
-        String status = parsedMap.getOrDefault("status", null).toString();
+            Map<String, Object> parsedMap = objectMapper.readValue(message, new TypeReference<>() {});
+            String senderJwt = parsedMap.getOrDefault("sender", null).toString();
+            String status = parsedMap.getOrDefault("status", null).toString();
 
-        if (senderJwt == null || status == null)
-            throw new IllegalArgumentException("senderJwt или status не могут быть null");
+            if (senderJwt == null || status == null)
+                throw new IllegalArgumentException("senderJwt или status не могут быть null");
 
-        log.info("Принято сообщение: " + message);
-        return friendshipWebSocketService.handleFriendshipMessage(receiverId, senderJwt, status);
+            log.info("Принято сообщение: " + message);
+            return friendshipWebSocketService.handleFriendshipMessage(receiverId, senderJwt, status);
     }
+
 }

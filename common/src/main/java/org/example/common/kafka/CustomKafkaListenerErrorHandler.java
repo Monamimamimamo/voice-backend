@@ -1,4 +1,4 @@
-package org.example;
+package org.example.common.kafka;
 
 import lombok.AllArgsConstructor;
 import org.apache.kafka.clients.consumer.Consumer;
@@ -20,7 +20,7 @@ public class CustomKafkaListenerErrorHandler implements KafkaListenerErrorHandle
     public Object handleError(Message<?> message, ListenerExecutionFailedException exception) {
 
         if (exception.getCause() instanceof MessageConversionException) {
-            String errorMessage = STR."Ошибка при обработке сообщения Kafka: \{exception.getMessage()}";
+            String errorMessage = "Ошибка при обработке сообщения Kafka: " + exception.getMessage();
             simpMessagingTemplate.convertAndSend("/topic/error", errorMessage);
         }
 
@@ -30,7 +30,7 @@ public class CustomKafkaListenerErrorHandler implements KafkaListenerErrorHandle
     @Override
     public Object handleError(Message<?> message, ListenerExecutionFailedException exception, Consumer<?, ?> consumer) {
         if (exception.getCause() instanceof MessageConversionException) {
-            String errorMessage = STR."Ошибка при обработке сообщения Kafka: \{exception.getMessage()}";
+            String errorMessage = "Ошибка при обработке сообщения Kafka: " + exception.getMessage();
             simpMessagingTemplate.convertAndSend("/topic/error", errorMessage);
         }
 
@@ -40,7 +40,7 @@ public class CustomKafkaListenerErrorHandler implements KafkaListenerErrorHandle
     @Override
     public Object handleError(Message<?> message, ListenerExecutionFailedException exception, Consumer<?, ?> consumer, Acknowledgment ack) {
         if (exception.getCause() instanceof MessageConversionException) {
-            String errorMessage = STR."Ошибка при обработке сообщения Kafka: \{exception.getMessage()}";
+            String errorMessage = "Ошибка при обработке сообщения Kafka: " +exception.getMessage();
             simpMessagingTemplate.convertAndSend("/topic/error", errorMessage);
         }
 

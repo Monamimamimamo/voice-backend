@@ -1,10 +1,8 @@
-package org.example.common.service;
+package org.example.common.kafka;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.header.internals.RecordHeader;
-import org.example.common.domain.KafkaFriendshipRequest;
-import org.example.common.domain.KafkaFriendshipResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.requestreply.ReplyingKafkaTemplate;
 import org.springframework.kafka.requestreply.RequestReplyFuture;

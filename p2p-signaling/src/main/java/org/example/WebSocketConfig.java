@@ -1,6 +1,5 @@
 package org.example;
 
-import org.example.common.exeption.MissingAuthorizationTokenException;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -41,7 +40,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
                     // Проверяем наличие заголовка Authorization
                     if (authorizationHeader == null || authorizationHeader.isEmpty()) {
-                        throw new MissingAuthorizationTokenException("Токен авторизации отсутствует.");
                     }
                 }
                 return message;

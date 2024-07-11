@@ -2,12 +2,9 @@ package org.example.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.common.header.internals.RecordHeader;
-import org.example.common.service.KafkaService;
+import org.example.common.kafka.KafkaService;
 import org.example.domain.FriendshipOffer;
 import org.example.domain.FriendshipOfferRepo;
-import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;

@@ -1,12 +1,18 @@
 package org.example.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.example.common.domain.KafkaFriendshipRequest;
-import org.example.common.domain.KafkaFriendshipResponse;
+import org.example.common.auth.JwtService;
+import org.example.common.kafka.KafkaFriendshipRequest;
+import org.example.common.kafka.KafkaFriendshipResponse;
 import org.example.domain.Message;
 import org.example.domain.MessageRepo;
+import org.example.service.ChatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -15,71 +21,25 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 import java.util.List;
 
 @RestController
 @Slf4j
+@RequestMapping("/chat")
 public class ChatController {
-
     @Autowired
-    private MessageRepo messageRepo;
+    private ChatService chatService;
 
-    @KafkaListener(topics = "friendship-request-topic", groupId = "group_id", errorHandler = "customKafkaListenerErrorHandler")
-    @SendTo("friendship-response-topic")
-    public KafkaFriendshipResponse getCurrencyData(ConsumerRecord<String, KafkaFriendshipRequest> record) {
-        KafkaFriendshipResponse result = new KafkaFriendshipResponse("completed");
-        try {
-            KafkaFriendshipRequest request = record.value();
-            log.info(request.toString());
-            log.info("Возвращаем: " + result);
-            return result;
-        } catch (Exception e) {
-            log.error("Ошибка при обработке сообщения Kafka: {}", e.getMessage());
-        }
-        result.setStatus("not completed");
-        log.info("Возвращаем: " + result);
-        return new KafkaFriendshipResponse("not completed");
-    }
-
-    @CrossOrigin(origins = "*")
-    @GetMapping("/chat/history/messages")
-    public ResponseEntity<List<Message>> getMessages(HttpServletRequest request,
-                                                     @RequestParam(name = "senderId", required = true) String senderId,
-                                                     @RequestParam(name = "receiverId", required = true) String receiverId,
-                                                     @RequestParam(name = "page", required = true) Integer page,
-                                                     @RequestParam(name = "length", required = true) int length) {
-
-        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (authHeader == null ||!authHeader.startsWith("Bearer ")) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED); // Unauthorized access
-        }
-//        String token = authHeader.substring(7);
-//        Claims claims = Jwts.parser()
-//                .setSigningKey("FBF0E5C5-056A-4DE9-A9B4-CAC04513C5D8".getBytes())
-//                .parseClaimsJws(token)
-//                .getBody();
-//        String userName = claims.get("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress", String.class);
-//
-//        if (Objects.equals(senderId, userName)) {
-//            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-//        }
-        if (length <= 0) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        Pageable pageable = PageRequest.of(page, length);
-
-        List<Message> messages = messageRepo.findMessagesBySenderOrReceiver(senderId, receiverId, pageable);
-        if (messages.isEmpty()) {
-            return new ResponseEntity<>(Collections.emptyList(), HttpStatus.OK);
-        }
-
-        return new ResponseEntity<>(messages, HttpStatus.OK);
+    @GetMapping("/history/messages")
+    @Operation(summary = "Получение истории сообщений двух пользователей", parameters = {@Parameter(in = ParameterIn.HEADER, name = HttpHeaders.AUTHORIZATION, required = true, description = "JWT Bearer токен пользователя")})
+    public ResponseEntity<List<Message>> getMessagesHistory(HttpServletRequest request,
+                                                     @Parameter(description = "ID получателя") @RequestParam(name = "receiverId", required = true) String receiverId,
+                                                     @Parameter(description = "Страница пагинации") @RequestParam(name = "page", required = true) int page,
+                                                     @Parameter(description = "Длина страницы пагинация") @RequestParam(name = "length", required = true) int length) {
+        if (length <= 0) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(chatService.getMessagesHistory(request, receiverId, page, length), HttpStatus.OK) ;
     }
 }

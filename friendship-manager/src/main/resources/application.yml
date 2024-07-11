@@ -1,9 +1,5 @@
 server:
   port: 9004
-#  ssl:
-#    key-store: classpath:keystore.jks
-#    key-store-password: aA258007195
-#    key-store-type: JKS
 
 spring:
   application:
@@ -20,7 +16,3 @@ spring:
 
 jwt:
   secret: FBF0E5C5-056A-4DE9-A9B4-CAC04513C5D8
-
-springdoc:
-  swagger-ui:
-    path: /swagger-ui.html

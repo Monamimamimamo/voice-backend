@@ -2,8 +2,8 @@ package org.example.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.common.service.JwtService;
-import org.example.common.service.KafkaService;
+import org.example.common.auth.JwtService;
+import org.example.common.kafka.KafkaService;
 import org.example.domain.FriendshipOffer;
 import org.example.domain.FriendshipOfferRepo;
 import org.json.simple.JSONObject;

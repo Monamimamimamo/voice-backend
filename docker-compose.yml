@@ -33,30 +33,22 @@ services:
       - "5431:5432"
 
 
-  gateway:
-    image: monamimamimamo/gateway:1.5
-    ports:
-      - "8082:8082"
-    environment:
-      - server.ssl.key-store=classpath:keystore.jks
-      - server.ssl.key-store-type=JKS
-      - server.ssl.key-store-password=aA258007195
-
   p2p-signaling:
     image: monamimamimamo/p2p-signaling:1.1
     depends_on:
-      - gateway
+      - kafka
     ports:
       - "9000:9000"
     environment:
-      - server.ssl.key-store=classpath:keystore.jks
-      - server.ssl.key-store-type=JKS
-      - server.ssl.key-store-password=aA258007195
+      #server.ssl.key-store: classpath:keystore.jks
+      #server.ssl.key-store-type: JKS
+      #server.ssl.key-store-password: aA258007195
+      spring.kafka.bootstrap-servers: kafka:9001
 
   p2p-chat:
     image: monamimamimamo/p2p-chat:1.1
     depends_on:
-      - gateway
+      - kafka
       - messages-db
     ports:
       - "9003:9003"
@@ -82,15 +74,15 @@ services:
   friendship-manager:
     image: monamimamimamo/friendship-manager:1.2
     depends_on:
-      - gateway
+      - kafka
       - friendship-offers-db
     ports:
       - "9004:9004"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://friendship-offers-db:5432/friendship_manager
-      #server.ssl.key-store: classpath:keystore.jks
-      #server.ssl.key-store-type: JKS
-      #server.ssl.key-store-password: aA258007195
+      server.ssl.key-store: classpath:keystore.jks
+      server.ssl.key-store-type: JKS
+      server.ssl.key-store-password: aA258007195
       spring.kafka.bootstrap-servers: kafka:9001
 
 
@@ -99,6 +91,7 @@ services:
     image: sunbros/identityapi
     depends_on:
       - db
+      - kafka
     environment:
       - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=UserTest;Username=postgres;Password=qe13zc24680
       - ASPNETCORE_ENVIRONMENT=Development

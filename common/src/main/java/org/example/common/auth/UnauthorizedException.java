@@ -1,4 +1,4 @@
-package org.example.common.exeption;
+package org.example.common.auth;
 
 
 import org.springframework.http.HttpStatus;
