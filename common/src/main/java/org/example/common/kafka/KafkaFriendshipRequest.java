@@ -8,9 +8,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class KafkaFriendshipRequest {
-    private String sender;
-    private String receiver;
-    private String type;
+    private String User;
+    private String Friend;
+    private String Type;
 }
 
 

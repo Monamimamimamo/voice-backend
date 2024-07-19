@@ -22,7 +22,7 @@ public class Message {
     @Lob
     private String content;
 
-    private LocalDateTime timestamp;
+    private String timestamp;
 
     private String sender;
 

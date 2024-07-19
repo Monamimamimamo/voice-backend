@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.Map;
 
 @Service
@@ -18,11 +21,18 @@ public class WebSocketService {
     private MessageRepo messageRepo;
 
     public JSONObject handleChat(Map<String, Object> map, String senderId, String receiverId) {
+        String zonedDateTimeUtc = LocalDateTime
+                .now()
+                .atZone(ZoneId.systemDefault())
+                .withZoneSameInstant(ZoneId.of("UTC"))
+                .format(new DateTimeFormatterBuilder()
+                        .appendPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'")
+                        .toFormatter());
 
         String content = map.getOrDefault("content", null).toString();
         Message db_message = Message.builder()
                 .content(content)
-                .timestamp(LocalDateTime.now())
+                .timestamp(zonedDateTimeUtc)
                 .sender(senderId)
                 .receiver(receiverId)
                 .build();

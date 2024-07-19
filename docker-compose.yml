@@ -40,9 +40,9 @@ services:
     ports:
       - "9000:9000"
     environment:
-      #server.ssl.key-store: classpath:keystore.jks
-      #server.ssl.key-store-type: JKS
-      #server.ssl.key-store-password: aA258007195
+      server.ssl.key-store: classpath:keystore.jks
+      server.ssl.key-store-type: JKS
+      server.ssl.key-store-password: aA258007195
       spring.kafka.bootstrap-servers: kafka:9001
 
   p2p-chat:

@@ -26,6 +26,7 @@ public class FriendshipWebSocketService {
     private static final String ERROR_MESSAGE_OFFER_NOT_FOUND = "Не существует такого %s запроса дружбы";
     private static final String ERROR_MESSAGE_STATUS_ALREADY_SET = "Вы уже %s запрос на дружбу";
     private static final String ERROR_FRIEND_LIST_DATABASE_UPDATE = "Заявка не смогла сохраниться у второго пользователя";
+    private static final String ERROR_MYSELF_OFFER = "Заявка отправлена самому себе";
 
 
 
@@ -37,7 +38,6 @@ public class FriendshipWebSocketService {
             case "pending" -> handlePendingStatus(existingOffer, senderId, receiverId, time);
             case "accepted" -> handleAcceptedStatus(existingOffer, senderId, receiverId, time);
             case "refused" -> handleRefusedStatus(existingOffer, senderId, receiverId, time);
-            case "checked" -> handleCheckedStatus(existingOffer, senderId, receiverId, time);
             default -> returnMessageError("Команда не опознана");
         };
     }
@@ -45,10 +45,12 @@ public class FriendshipWebSocketService {
     private JSONObject handlePendingStatus(FriendshipOffer existingOffer, String senderId, String receiverId, LocalDateTime time) {
         if (existingOffer!= null)
             return returnMessageError(ERROR_MESSAGE_PENDING_ALREADY_SENT);
+        if (Objects.equals(senderId, receiverId))
+            return returnMessageError(ERROR_MYSELF_OFFER);
         existingOffer = FriendshipOffer.builder().sender(senderId).receiver(receiverId).status("pending").timestamp(time).build();
         friendshipOfferRepo.save(existingOffer);
         log.info("Сохранена запись: " + existingOffer);
-        return convertToJsonObject(existingOffer);
+        return convertToJsonObject(existingOffer, senderId);
     }
 
     private JSONObject handleAcceptedStatus(FriendshipOffer existingOffer, String senderId, String receiverId, LocalDateTime time) throws ExecutionException, InterruptedException {
@@ -63,7 +65,7 @@ public class FriendshipWebSocketService {
                 existingOffer.setStatus("accepted");
                 friendshipOfferRepo.save(existingOffer);
                 log.info("Сохранена запись: " + existingOffer);
-                return convertToJsonObject(existingOffer);
+                return convertToJsonObject(existingOffer, senderId);
             } else {
                 return returnMessageError(ERROR_FRIEND_LIST_DATABASE_UPDATE);
             }
@@ -80,28 +82,16 @@ public class FriendshipWebSocketService {
             existingOffer.setStatus("refused");
             friendshipOfferRepo.save(existingOffer);
             log.info("Сохранена запись: " + existingOffer);
-            return convertToJsonObject(existingOffer);
+            return convertToJsonObject(existingOffer, senderId);
         }
     }
 
 
-    private JSONObject handleCheckedStatus(FriendshipOffer existingOffer, String senderId, String receiverId, LocalDateTime time) {
-        if (existingOffer == null)
-            return returnMessageError(ERROR_MESSAGE_OFFER_NOT_FOUND, "pending");
-        else if (existingOffer.getStatus().equals("refused") || existingOffer.getStatus().equals("accepted")){
-            friendshipOfferRepo.deleteById(existingOffer.getId());
-            log.info("Удалена запись: " + existingOffer);
-            existingOffer.setStatus("deleted");
-            return convertToJsonObject(existingOffer);
-        }
-        else return returnMessageError(ERROR_MESSAGE_OFFER_NOT_FOUND, "pending or refused");
-    }
-
-
-
-    public JSONObject convertToJsonObject(FriendshipOffer existingOffer) {
+    public JSONObject convertToJsonObject(FriendshipOffer existingOffer, String sender) {
         JSONObject jsonObject = new JSONObject();
+        jsonObject.put("type", "friendRequest");
         jsonObject.put("id", existingOffer.getId());
+        jsonObject.put("sender", sender);
         jsonObject.put("timestamp", existingOffer.getTimestamp().toString());
         jsonObject.put("status", existingOffer.getStatus());
         return jsonObject;
@@ -110,13 +100,15 @@ public class FriendshipWebSocketService {
 
     public static JSONObject returnMessageError(String message) {
         JSONObject resultJson = new JSONObject();
-        resultJson.put("error", message);
+        resultJson.put("type", "error");
+        resultJson.put("body", message);
         return resultJson;
     }
 
     public static JSONObject returnMessageError(String message, String type) {
         JSONObject resultJson = new JSONObject();
-        resultJson.put("error", String.format(message, type));
+        resultJson.put("type", "error");
+        resultJson.put("body", String.format(message, type));
         return resultJson;
     }
 }
