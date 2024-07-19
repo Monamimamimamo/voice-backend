@@ -44,7 +44,7 @@ public class ChatController {
         return new ResponseEntity<>(chatService.getMessagesHistory(request, receiverId, page, length), HttpStatus.OK);
     }
 
-    @GetMapping("/existing")
+    @GetMapping("/find-existing-chats")
     @Operation(summary = "Получение существующих чатов пользователя с последним сообщением", parameters = {@Parameter(in = ParameterIn.HEADER, name = HttpHeaders.AUTHORIZATION, required = true, description = "JWT Bearer токен пользователя")})
     public ResponseEntity<List<P2pChat>> getExistingChats(HttpServletRequest request,
                                                           @Parameter(description = "Страница пагинации") @RequestParam(name = "page", required = true) int page,

@@ -54,10 +54,10 @@ services:
       - "9003:9003"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://messages-db:5432/p2p_chat
+      spring.kafka.bootstrap-servers: kafka:9001
       server.ssl.key-store: classpath:keystore.jks
       server.ssl.key-store-type: JKS
       server.ssl.key-store-password: aA258007195
-      spring.kafka.bootstrap-servers: kafka:9001
 
 
   messages-db:
@@ -89,9 +89,6 @@ services:
 
   identityapi:
     image: sunbros/identityapi
-    depends_on:
-      - db
-      - kafka
     environment:
       - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=UserTest;Username=postgres;Password=qe13zc24680
       - ASPNETCORE_ENVIRONMENT=Development
@@ -99,17 +96,37 @@ services:
       - ASPNETCORE_Kestrel__Certificates__Default__Password=aA258007195
       - ASPNETCORE_HTTP_PORTS=8080
       - ASPNETCORE_HTTPS_PORTS=8081
-    volumes:
-      - ./aspnetapp.pfx:/home/app/.aspnet/https/aspnetapp.pfx:ro
     ports:
       - "8080:8080"
       - "8081:8081"
+    depends_on:
+      - db
+    volumes:
+      - ./aspnetapp.pfx:/home/app/.aspnet/https/aspnetapp.pfx:ro
 
+  usermanagerapi:
+    image: sunbros/usermanagerapi
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=UserTest;Username=postgres;Password=qe13zc24680
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/home/app/.aspnet/https/aspnetapp.pfx
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=aA258007195
+      - ASPNETCORE_HTTP_PORTS=8082
+      - ASPNETCORE_HTTPS_PORTS=8083
+    ports:
+      - "8082:8082"
+      - "8083:8083"
+    depends_on:
+      - kafka
+      - db
+      - identityapi
+    volumes:
+      - ./aspnetapp.pfx:/home/app/.aspnet/https/aspnetapp.pfx:ro
 
   db:
     image: postgres:latest
     environment:
-      POSTGRES_DB: UserTest
+      POSTGRES_DB: Voice
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: qe13zc24680
     ports:

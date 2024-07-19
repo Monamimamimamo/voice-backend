@@ -65,7 +65,6 @@ public class WebSocketService {
                 .timestamp(zonedDateTimeUtc)
                 .sender(senderId)
                 .receiver(receiverId)
-                .chat(chat)
                 .build();
     }
 }

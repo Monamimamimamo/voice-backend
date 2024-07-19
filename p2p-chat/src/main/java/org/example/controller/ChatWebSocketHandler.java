@@ -6,6 +6,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.domain.Message;
 import org.example.domain.MessageRepo;
 import org.example.service.WebSocketService;
@@ -34,6 +35,7 @@ import java.util.Objects;
 
 @RestController
 @AllArgsConstructor
+@Slf4j
 public class ChatWebSocketHandler {
 
     private final ObjectMapper objectMapper;
@@ -45,6 +47,7 @@ public class ChatWebSocketHandler {
     @SendTo("/topic/chat/{senderId}/{receiverId}")
     public JSONObject handleChat(String message, @DestinationVariable("senderId") String senderId, @DestinationVariable("receiverId") String receiverId) throws ParseException, IOException {
         Map<String, Object> map = objectMapper.readValue(message, new TypeReference<>() {});
+        log.info("Пришло сообщение: " + map);
         return webSocketService.handleChat(map, senderId, receiverId);
     }
 }

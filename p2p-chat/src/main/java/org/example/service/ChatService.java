@@ -2,6 +2,7 @@ package org.example.service;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.common.auth.JwtService;
@@ -42,6 +43,7 @@ public class ChatService {
             return messages;
     }
 
+    @Transactional
     public List<P2pChat> getExistingChats (HttpServletRequest request, String receiver, int page, int length){
         String userName = jwtService.extractUserName(request);
         Pageable pageable = PageRequest.of(page, length);

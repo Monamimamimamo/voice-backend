@@ -15,7 +15,8 @@ public class P2pChat {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "lastMessage", referencedColumnName = "id")
     private Message lastMessage;
 
     @NotNull
@@ -23,4 +24,5 @@ public class P2pChat {
 
     @NotNull
     private String user2;
+
 }

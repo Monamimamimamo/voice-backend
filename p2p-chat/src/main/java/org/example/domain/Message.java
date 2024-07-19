@@ -24,10 +24,6 @@ public class Message {
     @NotNull
     private String content;
 
-    @ManyToOne
-    @NotNull
-    private P2pChat chat;
-
     @NotNull
     private String timestamp;
 
@@ -36,4 +32,5 @@ public class Message {
 
     @NotNull
     private String receiver;
+
 }

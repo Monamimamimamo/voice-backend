@@ -13,19 +13,17 @@ import java.util.UUID;
 @Repository
 public interface P2pChatRepository extends JpaRepository<P2pChat, UUID> {
 
-    @Query("SELECT m " +
-            "FROM P2pChat m WHERE " +
-            "(m.user1 = :user1) AND (m.user2 = :user2)" +
+    @Query(value = "SELECT * FROM p2p_chat WHERE " +
+            "(user1 = :user1 AND user2 = :user2)" +
             " OR " +
-            "(m.user1 = :user2) AND (m.user2 = :user1) " +
-            "ORDER BY m.timestamp DESC")
+            "(user1 = :user2 AND user2 = :user1)", nativeQuery = true)
     @Transactional
     P2pChat findChatByPair(@Param("user1") String user1, @Param("user2") String user2);
 
-    @Query("SELECT m " +
-            "FROM P2pChat m WHERE " +
-            "(m.user1 = :user1) OR (m.user2 = :user1) " +
-            "ORDER BY m.timestamp DESC")
+
+    @Query(value = "SELECT * " +
+            "FROM p2p_chat WHERE " +
+            "(user1 = :user1 OR user2 = :user1)", nativeQuery = true)
     @Transactional
     List<P2pChat> findChatByUser(@Param("user1") String user1, Pageable pageable);
 }
