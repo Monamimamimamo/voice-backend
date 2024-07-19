@@ -18,6 +18,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -32,7 +34,6 @@ public class ChatService {
             String userName = jwtService.extractUserName(request);
             Pageable pageable = PageRequest.of(page, length);
             List<Message> messages = messageRepo.findMessagesBySenderOrReceiver(userName, receiver, pageable);
-
             if (messages.isEmpty()) {
                 log.info(STR."Вернулся пустой список сообщений, пользователи: \{userName} и \{receiver}");
                 return Collections.emptyList();
@@ -41,16 +42,24 @@ public class ChatService {
             return messages;
     }
 
-    public List<P2pChat> getExistingChats (HttpServletRequest request, int page, int length){
+    public List<P2pChat> getExistingChats (HttpServletRequest request, String receiver, int page, int length){
         String userName = jwtService.extractUserName(request);
         Pageable pageable = PageRequest.of(page, length);
         List<P2pChat> chats = chatRepo.findChatByUser(userName, pageable);
+        if (Objects.equals(receiver, ""))
+            chats = filterChatsByReceiver(chats, receiver);
         if (chats.isEmpty()) {
-            log.info(STR."Вернулся пустой список чатов, пользователь: \{userName}");
+            log.info(STR."Вернулся пустой список чатов, пользователь: \{userName} \nПолучатель: \{receiver}");
             return Collections.emptyList();
         }
         log.info("Отправлены чаты: " + chats);
         return chats;
+    }
+
+    private List<P2pChat> filterChatsByReceiver(List<P2pChat> chats, String receiver) {
+        return chats.stream()
+                .filter(chat -> chat.getUser1().contains(receiver) || chat.getUser2().contains(receiver))
+                .collect(Collectors.toList());
     }
 
 }

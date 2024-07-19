@@ -39,7 +39,7 @@ public class ChatController {
     public ResponseEntity<List<Message>> getMessagesHistory(HttpServletRequest request,
                                                             @Parameter(description = "ID получателя") @RequestParam(name = "receiverId", required = true) String receiverId,
                                                             @Parameter(description = "Страница пагинации") @RequestParam(name = "page", required = true) int page,
-                                                            @Parameter(description = "Длина страницы пагинация") @RequestParam(name = "length", required = true) int length) {
+                                                            @Parameter(description = "Длина страницы пагинации") @RequestParam(name = "length", required = true) int length) {
         if (length <= 0) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(chatService.getMessagesHistory(request, receiverId, page, length), HttpStatus.OK);
     }
@@ -48,8 +48,9 @@ public class ChatController {
     @Operation(summary = "Получение существующих чатов пользователя с последним сообщением", parameters = {@Parameter(in = ParameterIn.HEADER, name = HttpHeaders.AUTHORIZATION, required = true, description = "JWT Bearer токен пользователя")})
     public ResponseEntity<List<P2pChat>> getExistingChats(HttpServletRequest request,
                                                           @Parameter(description = "Страница пагинации") @RequestParam(name = "page", required = true) int page,
-                                                          @Parameter(description = "Длина страницы пагинация") @RequestParam(name = "length", required = true) int length) {
+                                                          @Parameter(description = "Длина страницы пагинации") @RequestParam(name = "length", required = true) int length,
+                                                          @Parameter(description = "Тот, кому мы писали") @RequestParam(name = "receiver", required = true) String receiver) {
         if (length <= 0) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        return new ResponseEntity<>(chatService.getExistingChats(request, page, length), HttpStatus.OK);
+        return new ResponseEntity<>(chatService.getExistingChats(request, receiver, page, length), HttpStatus.OK);
     }
 }

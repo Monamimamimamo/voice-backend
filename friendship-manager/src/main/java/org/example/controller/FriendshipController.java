@@ -39,13 +39,12 @@ public class FriendshipController {
     @Operation(summary = "Удаление пользователя из списка друзей", parameters = {@Parameter(in = ParameterIn.HEADER, name = HttpHeaders.AUTHORIZATION, required = true, description = "JWT Bearer токен пользователя")})
     public ResponseEntity<String> removeFromFriends(@Parameter(description = "Логин удаляемого пользователя") @PathVariable String friend,
                                                     HttpServletRequest request) throws ExecutionException, InterruptedException {
-            String userName = jwtService.extractUserName(request);
-            if (userName == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            }
-            return ResponseEntity.ok(friendshipService.deleteFromFriends("remove", userName, friend));
+        String userName = jwtService.extractUserName(request);
+        if (userName == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        return ResponseEntity.ok(friendshipService.deleteFromFriends("remove", userName, friend));
     }
-
 
 
     @GetMapping("/history")
@@ -63,7 +62,5 @@ public class FriendshipController {
         List<Map<String, Object>> offers = friendshipService.getOffersByTypeAndBelonging(userName, type, belonging, token);
         return ResponseEntity.ok(offers);
     }
-
-
 }
 
