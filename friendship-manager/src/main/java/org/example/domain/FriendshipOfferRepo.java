@@ -1,6 +1,7 @@
 package org.example.domain;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -11,6 +12,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface FriendshipOfferRepo extends JpaRepository<FriendshipOffer, UUID> {
+
+    @Modifying
+    @Query("DELETE FROM FriendshipOffer fo WHERE fo.sender = :sender AND fo.receiver = :receiver AND fo.status = 'pending'")
+    void deletePendingOfferBySenderAndReceiver(@Param("sender") String sender, @Param("receiver") String receiver);
 
     Optional<FriendshipOffer> findBySenderAndReceiver(String sender, String receiver);
 

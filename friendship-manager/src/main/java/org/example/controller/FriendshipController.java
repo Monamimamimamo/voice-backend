@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.common.auth.JwtService;
+import org.example.domain.OperationStatus;
 import org.example.service.FriendshipService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -61,6 +62,13 @@ public class FriendshipController {
         String token = authHeader.substring(7);
         List<Map<String, Object>> offers = friendshipService.getOffersByTypeAndBelonging(userName, type, belonging, token);
         return ResponseEntity.ok(offers);
+    }
+
+    @PostMapping("/history/remove-pending-offer")
+    @Operation(summary = "Удаление ожидающего запроса в друзья", parameters = {@Parameter(in = ParameterIn.HEADER, name = HttpHeaders.AUTHORIZATION, required = true, description = "JWT Bearer токен пользователя")})
+    public ResponseEntity<OperationStatus> deletePendingOffer(HttpServletRequest request,
+                                                              @Parameter(description = "Тот, кому мы отправляли запрос") @RequestParam(name = "receiver", required = true) String receiver) {
+        return ResponseEntity.ok(friendshipService.deletePendingOffer(request, receiver));
     }
 }
 

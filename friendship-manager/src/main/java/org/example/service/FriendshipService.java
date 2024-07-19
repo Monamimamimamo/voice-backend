@@ -2,15 +2,15 @@ package org.example.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.common.auth.JwtService;
 import org.example.common.kafka.KafkaService;
 import org.example.domain.FriendshipOffer;
 import org.example.domain.FriendshipOfferRepo;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.example.domain.OperationStatus;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -28,7 +28,18 @@ public class FriendshipService {
 
     private final FriendshipOfferRepo friendshipOfferRepo;
     private final KafkaService kafkaService;
+    private final JwtService jwtService;
 
+    public OperationStatus deletePendingOffer(HttpServletRequest request, String receiver){
+        try {
+            String userName = jwtService.extractUserName(request);
+            friendshipOfferRepo.deletePendingOfferBySenderAndReceiver(userName, receiver);
+            return new OperationStatus("success");
+        } catch (Exception e){
+            log.error("Ошибка при удалении предложения дружбы", e);
+            return new OperationStatus("something went wrong");
+        }
+    }
 
     public String deleteFromFriends(String user, String friend, String type) throws ExecutionException, InterruptedException {
         return kafkaService.sendKafkaMessage(user, friend, type);
@@ -82,7 +93,7 @@ public class FriendshipService {
         }
     }
 
-    public void validateType(String type) throws IllegalArgumentException {
+    private void validateType(String type) throws IllegalArgumentException {
         if (!"accepted".equals(type) &&!"refused".equals(type) &&!"pending".equals(type))
             throw new IllegalArgumentException("Неверный тип предложения дружбы");
     }
