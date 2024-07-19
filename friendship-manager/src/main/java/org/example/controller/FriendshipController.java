@@ -66,9 +66,10 @@ public class FriendshipController {
 
     @PostMapping("/history/remove-pending-offer")
     @Operation(summary = "Удаление ожидающего запроса в друзья", parameters = {@Parameter(in = ParameterIn.HEADER, name = HttpHeaders.AUTHORIZATION, required = true, description = "JWT Bearer токен пользователя")})
-    public ResponseEntity<OperationStatus> deletePendingOffer(HttpServletRequest request,
-                                                              @Parameter(description = "Тот, кому мы отправляли запрос") @RequestParam(name = "receiver", required = true) String receiver) {
-        return ResponseEntity.ok(friendshipService.deletePendingOffer(request, receiver));
+    public ResponseEntity<OperationStatus> deletePendingOffer(
+            HttpServletRequest request,
+            @Parameter(description = "Тот, кому мы отправляли запрос") @RequestParam(name = "receiver", required = true) String receiver) {
+        return friendshipService.deletePendingOffer(request, receiver);
     }
 }
 

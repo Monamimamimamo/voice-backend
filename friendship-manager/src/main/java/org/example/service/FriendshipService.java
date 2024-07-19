@@ -2,6 +2,7 @@ package org.example.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.NoResultException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,16 +31,19 @@ public class FriendshipService {
     private final KafkaService kafkaService;
     private final JwtService jwtService;
 
-    public OperationStatus deletePendingOffer(HttpServletRequest request, String receiver){
+    public ResponseEntity<OperationStatus> deletePendingOffer(HttpServletRequest request, String receiver){
         try {
             String userName = jwtService.extractUserName(request);
-            friendshipOfferRepo.deletePendingOfferBySenderAndReceiver(userName, receiver);
-            return new OperationStatus("success");
-        } catch (Exception e){
+            int affectedRows = friendshipOfferRepo.deletePendingOfferBySenderAndReceiver(userName, receiver);
+            if (affectedRows == 0)
+                return ResponseEntity.notFound().build();
+            return ResponseEntity.ok().body(new OperationStatus("success"));
+        } catch (Exception e) {
             log.error("Ошибка при удалении предложения дружбы", e);
-            return new OperationStatus("something went wrong");
+            return ResponseEntity.badRequest().body(new OperationStatus("something went wrong"));
         }
     }
+
 
     public String deleteFromFriends(String user, String friend, String type) throws ExecutionException, InterruptedException {
         return kafkaService.sendKafkaMessage(user, friend, type);
