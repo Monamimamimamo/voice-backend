@@ -15,10 +15,10 @@ import java.util.concurrent.ExecutionException;
 @Service
 @Slf4j
 public class KafkaService {
-    private final ReplyingKafkaTemplate<String, KafkaFriendshipRequest, KafkaFriendshipResponse> replyingKafkaTemplate;
+    private final ReplyingKafkaTemplate<String, KafkaFriendshipRequest, FriendshipResponse> replyingKafkaTemplate;
 
     @Autowired
-    public KafkaService(ReplyingKafkaTemplate<String, KafkaFriendshipRequest, KafkaFriendshipResponse> replyingKafkaTemplate) {
+    public KafkaService(ReplyingKafkaTemplate<String, KafkaFriendshipRequest, FriendshipResponse> replyingKafkaTemplate) {
         this.replyingKafkaTemplate = replyingKafkaTemplate;
     }
 
@@ -27,9 +27,9 @@ public class KafkaService {
         ProducerRecord<String, KafkaFriendshipRequest> record = new ProducerRecord<>("friendship-request-topic", request);
         record.headers().add(new RecordHeader(KafkaHeaders.REPLY_TOPIC, "friendship-response-topic".getBytes()));
         log.info("Отправлен объект: " + record);
-        RequestReplyFuture<String, KafkaFriendshipRequest, KafkaFriendshipResponse> futureResponse =  replyingKafkaTemplate.sendAndReceive(record, Duration.ofSeconds(6));
+        RequestReplyFuture<String, KafkaFriendshipRequest, FriendshipResponse> futureResponse =  replyingKafkaTemplate.sendAndReceive(record, Duration.ofSeconds(20));
         log.info("Получен объект: " + futureResponse.get().value());
-        KafkaFriendshipResponse response = futureResponse.get().value();
-        return response.getStatus();
+        FriendshipResponse response = futureResponse.get().value();
+        return response.getDescription();
     }
 }

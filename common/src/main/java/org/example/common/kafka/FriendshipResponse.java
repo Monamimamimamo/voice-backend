@@ -8,11 +8,13 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class KafkaFriendshipResponse {
-    private String status;
+public class FriendshipResponse {
+    private boolean Result;
+    private String Description;
 
     @JsonCreator
-    public KafkaFriendshipResponse(@JsonProperty("status") String status) {
-        this.status = status;
+    public FriendshipResponse(@JsonProperty("Result") boolean Result, @JsonProperty("Description") String Description) {
+        this.Result = Result;
+        this.Description = Description;
     }
 }

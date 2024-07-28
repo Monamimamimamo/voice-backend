@@ -66,7 +66,7 @@ public class FriendshipService {
         List<Map<String, Object>> users = new ArrayList<>();
         for (FriendshipOffer offer : offers) {
             StringBuilder sb = new StringBuilder();
-            String url = sb.append("https://voice-backend.ru:8081/api/Order/GetUser?friendName=")
+            String url = sb.append("https://voice-backend.ru:8083/api/Order/GetUser?friendName=")
                     .append(belonging.equals("sender") ? offer.getReceiver() : offer.getSender())
                     .append("&page=1&pageSize=1000000000").toString();
 

@@ -72,7 +72,7 @@ services:
       - "5430:5432"
 
   friendship-manager:
-    image: monamimamimamo/friendship-manager:1.2
+    image: monamimamimamo/friendship-manager:1.3
     depends_on:
       - kafka
       - friendship-offers-db
@@ -90,7 +90,7 @@ services:
   identityapi:
     image: sunbros/identityapi
     environment:
-      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=UserTest;Username=postgres;Password=qe13zc24680
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=Voice;Username=postgres;Password=qe13zc24680
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/home/app/.aspnet/https/aspnetapp.pfx
       - ASPNETCORE_Kestrel__Certificates__Default__Password=aA258007195
@@ -105,9 +105,9 @@ services:
       - ./aspnetapp.pfx:/home/app/.aspnet/https/aspnetapp.pfx:ro
 
   usermanagerapi:
-    image: sunbros/usermanagerapi
+    image: sunbros/usermanagerapi:1.3.4
     environment:
-      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=UserTest;Username=postgres;Password=qe13zc24680
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=Voice;Username=postgres;Password=qe13zc24680
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/home/app/.aspnet/https/aspnetapp.pfx
       - ASPNETCORE_Kestrel__Certificates__Default__Password=aA258007195

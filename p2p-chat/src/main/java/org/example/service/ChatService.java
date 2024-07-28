@@ -6,10 +6,7 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.common.auth.JwtService;
-import org.example.domain.Message;
-import org.example.domain.MessageRepo;
-import org.example.domain.P2pChat;
-import org.example.domain.P2pChatRepository;
+import org.example.domain.*;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -44,23 +41,42 @@ public class ChatService {
     }
 
     @Transactional
-    public List<P2pChat> getExistingChats (HttpServletRequest request, String receiver, int page, int length){
+    public List<ExistingChatResponse> getExistingChats (HttpServletRequest request, String receiver, int page, int length){
         String userName = jwtService.extractUserName(request);
         Pageable pageable = PageRequest.of(page, length);
         List<P2pChat> chats = chatRepo.findChatByUser(userName, pageable);
-        if (Objects.equals(receiver, ""))
-            chats = filterChatsByReceiver(chats, receiver);
         if (chats.isEmpty()) {
-            log.info(STR."Вернулся пустой список чатов, пользователь: \{userName} \nПолучатель: \{receiver}");
+            log.info(STR."Вернулся пустой список чатов, пользователь: \{userName}");
             return Collections.emptyList();
         }
-        log.info("Отправлены чаты: " + chats);
-        return chats;
+        List<ExistingChatResponse> response = convertChatsToResponses(chats, userName);
+        response = filterChatsByReceiver(response, receiver);
+        if (response.isEmpty()) {
+            log.info(STR."Вернулся пустой список чатов после фильтрации по пользователю, пользователь: \{userName} \nПолучатель: \{receiver}");
+            return Collections.emptyList();
+        }
+        log.info("Отправлены чаты: " + response);
+        return response;
     }
 
-    private List<P2pChat> filterChatsByReceiver(List<P2pChat> chats, String receiver) {
+
+    public List<ExistingChatResponse> convertChatsToResponses(List<P2pChat> chats, String userName) {
         return chats.stream()
-                .filter(chat -> chat.getUser1().contains(receiver) || chat.getUser2().contains(receiver))
+                .map(chat -> new ExistingChatResponse(chat.getId(), Objects.equals(userName, chat.getUser1()) ? chat.getUser2() : chat.getUser1(), getLastMessage(chat)))
+                .collect(Collectors.toList());
+    }
+
+    private ExistingChatResponse.LastMessage getLastMessage(P2pChat chat) {
+        return new ExistingChatResponse.LastMessage(
+                chat.getLastMessage().getSender(),
+                chat.getLastMessage().getContent(),
+                chat.getLastMessage().getTimestamp()
+        );
+    }
+
+    private List<ExistingChatResponse> filterChatsByReceiver(List<ExistingChatResponse> chats, String receiver) {
+        return chats.stream()
+                .filter(chat -> chat.getUser().toLowerCase().contains(receiver.toLowerCase()))
                 .collect(Collectors.toList());
     }
 

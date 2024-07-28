@@ -42,32 +42,32 @@ public class KafkaConfig  {
 
 
     @Bean
-    public ReplyingKafkaTemplate<String, KafkaFriendshipRequest, KafkaFriendshipResponse> replyingKafkaTemplate(
+    public ReplyingKafkaTemplate<String, KafkaFriendshipRequest, FriendshipResponse> replyingKafkaTemplate(
             ProducerFactory<String, KafkaFriendshipRequest> pf,
-            ConcurrentKafkaListenerContainerFactory<String, KafkaFriendshipResponse> factory) {
+            ConcurrentKafkaListenerContainerFactory<String, FriendshipResponse> factory) {
 
-        ConcurrentMessageListenerContainer<String, KafkaFriendshipResponse> repliesContainer = factory.createContainer("friendship-response-topic");
+        ConcurrentMessageListenerContainer<String, FriendshipResponse> repliesContainer = factory.createContainer("friendship-response-topic");
         repliesContainer.getContainerProperties().setGroupId("group_id");
         repliesContainer.setAutoStartup(false);
         return new ReplyingKafkaTemplate<>(pf, repliesContainer);
     }
 
         @Bean
-        public ConsumerFactory<String, KafkaFriendshipResponse> consumerFactory() {
+        public ConsumerFactory<String, FriendshipResponse> consumerFactory() {
             Map<String, Object> props = new HashMap<>();
             props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
             props.put(ConsumerConfig.GROUP_ID_CONFIG, "group_id");
             props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
             props.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
-            JsonDeserializer<KafkaFriendshipResponse> jsonDeserializer = new JsonDeserializer<>(KafkaFriendshipResponse.class);
+            JsonDeserializer<FriendshipResponse> jsonDeserializer = new JsonDeserializer<>(FriendshipResponse.class);
             props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, jsonDeserializer.getClass().getName());
 
             return new DefaultKafkaConsumerFactory<>(props);
         }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, KafkaFriendshipResponse> kafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, KafkaFriendshipResponse> factory =
+    public ConcurrentKafkaListenerContainerFactory<String, FriendshipResponse> kafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, FriendshipResponse> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
         factory.setReplyTemplate(kafkaTemplate());

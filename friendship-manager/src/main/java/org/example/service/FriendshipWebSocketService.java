@@ -7,9 +7,15 @@ import org.example.common.kafka.KafkaService;
 import org.example.domain.FriendshipOffer;
 import org.example.domain.FriendshipOfferRepo;
 import org.json.simple.JSONObject;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
@@ -21,6 +27,7 @@ public class FriendshipWebSocketService {
     private final JwtService jwtService;
     private final KafkaService kafkaService;
     private final FriendshipOfferRepo friendshipOfferRepo;
+    private static final RestTemplate restTemplate = new RestTemplate();
 
     private static final String ERROR_MESSAGE_PENDING_ALREADY_SENT = "Вы уже отправляли такой запрос на дружбу";
     private static final String ERROR_MESSAGE_OFFER_NOT_FOUND = "Не существует такого %s запроса дружбы";
@@ -60,6 +67,23 @@ public class FriendshipWebSocketService {
             return returnMessageError(ERROR_MESSAGE_STATUS_ALREADY_SET, "accepted");
         else {
             String response = kafkaService.sendKafkaMessage(receiverId, senderId, "accepted");
+            //HTTP :)
+//            StringBuilder sb = new StringBuilder();
+//            String url = sb.append("https://voice-backend.ru:8083/api/Order/AddFriend?user=")
+//                    .append(senderId)
+//                    .append("&friend=")
+//                    .append(receiverId)
+//                    .toString();
+//            HttpHeaders headers = new HttpHeaders();
+//            HttpEntity<String> entity = new HttpEntity<>(headers);
+//            ResponseEntity<String> responseEntity = restTemplate.exchange(
+//                    url,
+//                    HttpMethod.GET,
+//                    entity,
+//                    String.class);
+//
+//            String operationStatus = responseEntity.getBody();
+            // :)
             if (Objects.equals(response, "completed")){
                 existingOffer.setTimestamp(time);
                 existingOffer.setStatus("accepted");

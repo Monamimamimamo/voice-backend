@@ -41,9 +41,6 @@ public class FriendshipController {
     public ResponseEntity<String> removeFromFriends(@Parameter(description = "Логин удаляемого пользователя") @PathVariable String friend,
                                                     HttpServletRequest request) throws ExecutionException, InterruptedException {
         String userName = jwtService.extractUserName(request);
-        if (userName == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
         return ResponseEntity.ok(friendshipService.deleteFromFriends("remove", userName, friend));
     }
 
