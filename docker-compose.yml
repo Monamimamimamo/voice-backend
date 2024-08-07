@@ -40,7 +40,7 @@ services:
     ports:
       - "9000:9000"
     environment:
-      server.ssl.key-store: classpath:keystore.jks
+      server.ssl.key-store: classpath:new_keystore.jks
       server.ssl.key-store-type: JKS
       server.ssl.key-store-password: aA258007195
       spring.kafka.bootstrap-servers: kafka:9001
@@ -52,12 +52,13 @@ services:
       - messages-db
     ports:
       - "9003:9003"
+      - "1111:1111"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://messages-db:5432/p2p_chat
       spring.kafka.bootstrap-servers: kafka:9001
-      server.ssl.key-store: classpath:keystore.jks
-      server.ssl.key-store-type: JKS
-      server.ssl.key-store-password: aA258007195
+      #server.ssl.key-store: classpath:new_keystore.jks
+      #server.ssl.key-store-type: JKS
+      #server.ssl.key-store-password: aA258007195
 
 
   messages-db:
@@ -80,7 +81,7 @@ services:
       - "9004:9004"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://friendship-offers-db:5432/friendship_manager
-      server.ssl.key-store: classpath:keystore.jks
+      server.ssl.key-store: classpath:new_keystore.jks
       server.ssl.key-store-type: JKS
       server.ssl.key-store-password: aA258007195
       spring.kafka.bootstrap-servers: kafka:9001
@@ -92,7 +93,7 @@ services:
     environment:
       - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=Voice;Username=postgres;Password=qe13zc24680
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/home/app/.aspnet/https/aspnetapp.pfx
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/home/app/.aspnet/https/aspnetkey.pfx
       - ASPNETCORE_Kestrel__Certificates__Default__Password=aA258007195
       - ASPNETCORE_HTTP_PORTS=8080
       - ASPNETCORE_HTTPS_PORTS=8081
@@ -102,14 +103,14 @@ services:
     depends_on:
       - db
     volumes:
-      - ./aspnetapp.pfx:/home/app/.aspnet/https/aspnetapp.pfx:ro
+      - ./aspnetkey.pfx:/home/app/.aspnet/https/aspnetkey.pfx:ro
 
   usermanagerapi:
-    image: sunbros/usermanagerapi:1.3.4
+    image: sunbros/usermanagerapi:1.4
     environment:
       - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=Voice;Username=postgres;Password=qe13zc24680
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/home/app/.aspnet/https/aspnetapp.pfx
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/home/app/.aspnet/https/aspnetkey.pfx
       - ASPNETCORE_Kestrel__Certificates__Default__Password=aA258007195
       - ASPNETCORE_HTTP_PORTS=8082
       - ASPNETCORE_HTTPS_PORTS=8083
@@ -121,7 +122,7 @@ services:
       - db
       - identityapi
     volumes:
-      - ./aspnetapp.pfx:/home/app/.aspnet/https/aspnetapp.pfx:ro
+      - ./aspnetkey.pfx:/home/app/.aspnet/https/aspnetkey.pfx:ro
 
   db:
     image: postgres:latest

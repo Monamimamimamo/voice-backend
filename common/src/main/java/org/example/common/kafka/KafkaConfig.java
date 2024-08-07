@@ -13,7 +13,6 @@ import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -73,6 +72,7 @@ public class KafkaConfig  {
         factory.setReplyTemplate(kafkaTemplate());
         return factory;
     }
+
 }
 
 

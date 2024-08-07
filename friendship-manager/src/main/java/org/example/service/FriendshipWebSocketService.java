@@ -66,25 +66,25 @@ public class FriendshipWebSocketService {
         else if (existingOffer.getStatus().equals("accepted"))
             return returnMessageError(ERROR_MESSAGE_STATUS_ALREADY_SET, "accepted");
         else {
-            String response = kafkaService.sendKafkaMessage(receiverId, senderId, "accepted");
+            //String response = kafkaService.sendKafkaMessage(receiverId, senderId, "accepted");
             //HTTP :)
-//            StringBuilder sb = new StringBuilder();
-//            String url = sb.append("https://voice-backend.ru:8083/api/Order/AddFriend?user=")
-//                    .append(senderId)
-//                    .append("&friend=")
-//                    .append(receiverId)
-//                    .toString();
-//            HttpHeaders headers = new HttpHeaders();
-//            HttpEntity<String> entity = new HttpEntity<>(headers);
-//            ResponseEntity<String> responseEntity = restTemplate.exchange(
-//                    url,
-//                    HttpMethod.GET,
-//                    entity,
-//                    String.class);
-//
-//            String operationStatus = responseEntity.getBody();
+            StringBuilder sb = new StringBuilder();
+            String url = sb.append("https://voice-backend.ru:8083/api/Order/AddFriend?user=")
+                    .append(senderId)
+                    .append("&friend=")
+                    .append(receiverId)
+                    .toString();
+            HttpHeaders headers = new HttpHeaders();
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+            ResponseEntity<String> responseEntity = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    entity,
+                    String.class);
+
+            String response = responseEntity.getBody();
             // :)
-            if (Objects.equals(response, "completed")){
+            if (Objects.equals(response, "All good")){
                 existingOffer.setTimestamp(time);
                 existingOffer.setStatus("accepted");
                 friendshipOfferRepo.save(existingOffer);
