@@ -98,7 +98,8 @@
 
 
     <modules>
-        <module>common</module>
+        <module>dependencies/websocket</module>
+        <module>dependencies/common</module>
         <module>kurento-group-call</module>
         <module>p2p-signaling</module>
         <module>p2p-chat</module>

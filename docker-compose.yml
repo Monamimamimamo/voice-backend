@@ -55,9 +55,9 @@ services:
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://messages-db:5432/p2p_chat
       spring.kafka.bootstrap-servers: kafka:9001
-      server.ssl.key-store: classpath:keystore.jks
-      server.ssl.key-store-type: JKS
-      server.ssl.key-store-password: aA258007195
+      #server.ssl.key-store: classpath:keystore.jks
+      #server.ssl.key-store-type: JKS
+      #server.ssl.key-store-password: aA258007195
 
 
   messages-db:
