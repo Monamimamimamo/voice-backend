@@ -1,5 +1,6 @@
 package org.example.service;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.domain.Message;
 import org.example.domain.MessageRepo;
@@ -17,15 +18,13 @@ import java.util.Map;
 
 @Service
 @Slf4j
+@AllArgsConstructor
 public class WebSocketService {
 
-    @Autowired
-    private MessageRepo messageRepo;
+    private final MessageRepo messageRepo;
+    private final P2pChatRepository chatRepo;
 
-    @Autowired
-    private P2pChatRepository chatRepo;
-
-    public JSONObject handleChat(Map<String, Object> map, String senderId, String receiverId) {
+    public JSONObject handleChat(Map<String, String> map, String senderId, String receiverId) {
         String zonedDateTimeUtc = LocalDateTime
                 .now()
                 .atZone(ZoneId.systemDefault())
@@ -34,7 +33,7 @@ public class WebSocketService {
                         .appendPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'")
                         .toFormatter());
 
-        String content = map.getOrDefault("content", null).toString();
+        String content = map.getOrDefault("content", null);
         P2pChat existingChat = chatRepo.findChatByPair(senderId, receiverId);
         if (existingChat == null) {
             existingChat = new P2pChat();

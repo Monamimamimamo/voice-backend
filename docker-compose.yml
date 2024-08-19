@@ -33,16 +33,16 @@ services:
       - "5431:5432"
 
 
-  p2p-signaling:
-    image: monamimamimamo/p2p-signaling:1.1
+  websocket:
+    image: monamimamimamo/websocket:1.0
     depends_on:
       - kafka
     ports:
       - "9000:9000"
     environment:
-      server.ssl.key-store: classpath:keystore.jks
-      server.ssl.key-store-type: JKS
-      server.ssl.key-store-password: aA258007195
+      #server.ssl.key-store: classpath:keystore.jks
+      #server.ssl.key-store-type: JKS
+      #server.ssl.key-store-password: aA258007195
       spring.kafka.bootstrap-servers: kafka:9001
 
   p2p-chat:

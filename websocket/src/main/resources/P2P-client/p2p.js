@@ -2,7 +2,7 @@
 const messages = document.getElementById('messages');
 
 let stompClient = null;
-const socket = new SockJS('http://localhost:9000/signaling');
+const socket = new SockJS('http://localhost:9000/websocket');
 stompClient = Stomp.over(socket);
 
 let answerSent = false;

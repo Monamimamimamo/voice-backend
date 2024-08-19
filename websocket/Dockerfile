@@ -1,6 +1,6 @@
 FROM openjdk:21-jdk-slim
 
-COPY target/p2p-signaling-1.0-SNAPSHOT.jar /app.jar
+COPY target/websocket-1.0-SNAPSHOT.jar /app.jar
 
 WORKDIR /app
 

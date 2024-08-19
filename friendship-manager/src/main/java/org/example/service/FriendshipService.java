@@ -2,12 +2,11 @@ package org.example.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.persistence.NoResultException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.common.auth.JwtService;
-import org.example.common.kafka.KafkaService;
+//import org.example.common.kafka.KafkaService;
 import org.example.domain.FriendshipOffer;
 import org.example.domain.FriendshipOfferRepo;
 import org.example.domain.OperationStatus;
@@ -28,7 +27,7 @@ public class FriendshipService {
     private static final RestTemplate restTemplate = new RestTemplate();
 
     private final FriendshipOfferRepo friendshipOfferRepo;
-    private final KafkaService kafkaService;
+//    private final KafkaService kafkaService;
     private final JwtService jwtService;
 
     public ResponseEntity<OperationStatus> deletePendingOffer(HttpServletRequest request, String receiver){
@@ -46,7 +45,8 @@ public class FriendshipService {
 
 
     public String deleteFromFriends(String user, String friend, String type) throws ExecutionException, InterruptedException {
-        return kafkaService.sendKafkaMessage(user, friend, type);
+        return null;
+//        return kafkaService.sendKafkaMessage(user, friend, type);
     }
 
     public void deleteByTimestampBefore(LocalDateTime timestamp) {

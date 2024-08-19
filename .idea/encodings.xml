@@ -4,8 +4,7 @@
     <file url="file://$PROJECT_DIR$/common/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/dependencies/common/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/dependencies/common/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/dependencies/websocket/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/dependencies/websocket/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/dependencies/kafka/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/eureka-server/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/friendship-manager/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/gateway/src/main/java" charset="UTF-8" />
@@ -16,5 +15,7 @@
     <file url="file://$PROJECT_DIR$/p2p-signaling/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/websocket/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/websocket/src/main/resources" charset="UTF-8" />
   </component>
 </project>

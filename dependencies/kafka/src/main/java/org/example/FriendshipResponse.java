@@ -1,4 +1,4 @@
-package org.example.common.kafka;
+package org.example;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

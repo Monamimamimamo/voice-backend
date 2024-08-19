@@ -3,7 +3,7 @@ package org.example.service;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.common.auth.JwtService;
-import org.example.common.kafka.KafkaService;
+//import org.example.common.kafka.KafkaService;
 import org.example.domain.FriendshipOffer;
 import org.example.domain.FriendshipOfferRepo;
 import org.json.simple.JSONObject;
@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
-import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
@@ -25,7 +24,7 @@ import java.util.concurrent.ExecutionException;
 public class FriendshipWebSocketService {
 
     private final JwtService jwtService;
-    private final KafkaService kafkaService;
+//    private final KafkaService kafkaService;
     private final FriendshipOfferRepo friendshipOfferRepo;
     private static final RestTemplate restTemplate = new RestTemplate();
 
@@ -66,21 +65,21 @@ public class FriendshipWebSocketService {
         else if (existingOffer.getStatus().equals("accepted"))
             return returnMessageError(ERROR_MESSAGE_STATUS_ALREADY_SET, "accepted");
         else {
-            String response = kafkaService.sendKafkaMessage(receiverId, senderId, "accepted");
+//            String response = kafkaService.sendKafkaMessage(receiverId, senderId, "accepted");
             //HTTP :)
-//            StringBuilder sb = new StringBuilder();
-//            String url = sb.append("https://voice-backend.ru:8083/api/Order/AddFriend?user=")
-//                    .append(senderId)
-//                    .append("&friend=")
-//                    .append(receiverId)
-//                    .toString();
-//            HttpHeaders headers = new HttpHeaders();
-//            HttpEntity<String> entity = new HttpEntity<>(headers);
-//            ResponseEntity<String> responseEntity = restTemplate.exchange(
-//                    url,
-//                    HttpMethod.GET,
-//                    entity,
-//                    String.class);
+            StringBuilder sb = new StringBuilder();
+            String url = sb.append("https://voice-backend.ru:8083/api/Order/AddFriend?user=")
+                    .append(senderId)
+                    .append("&friend=")
+                    .append(receiverId)
+                    .toString();
+            HttpHeaders headers = new HttpHeaders();
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+            String response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    entity,
+                    String.class).getBody();
 //
 //            String operationStatus = responseEntity.getBody();
             // :)
