@@ -7,12 +7,18 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.example.KafkaService;
 import org.example.common.auth.JwtService;
 import org.example.domain.OperationStatus;
 import org.example.service.FriendshipService;
+import org.example.service.FriendshipWebSocketService;
+import org.json.simple.JSONObject;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,6 +35,17 @@ public class FriendshipController {
 
     private final FriendshipService friendshipService;
     private final JwtService jwtService;
+    private final KafkaService kafkaService;
+    private final FriendshipWebSocketService friendshipWebSocketService;
+
+    @KafkaListener(topics = "friendship_request_topic", groupId = "group_id")
+    @SendTo("friendship_response_topic")
+    public JSONObject handleFriendshipMessage(ConsumerRecord<Object, Map<String, String>> record) throws ExecutionException, InterruptedException {
+        log.info(STR."Из кафка пришло сообщение: \{record.value().toString()}\nИз топика: \{record.topic()}");
+        Map<String, String> map = record.value();
+        return friendshipWebSocketService.handleFriendshipMessage(map.get("receiverId"), map.get("senderId"), map.get("status"));
+
+    }
 
     @Scheduled(cron = "0 0 0 * * ?")
     public void deleteOldFriendshipOffers() {
