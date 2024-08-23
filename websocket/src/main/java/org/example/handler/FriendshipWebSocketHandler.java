@@ -8,7 +8,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.KafkaService;
 import org.example.common.auth.JwtService;
-import org.json.simple.JSONObject;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -45,9 +44,6 @@ public class FriendshipWebSocketHandler {
         request.put("senderId", senderId);
         request.put("status", status);
         log.info("Принято сообщение: " + message);
-        Object response = kafkaService.sendAndReceive(request, "friendship_request_topic", "friendship_response_topic");
-        log.info("Из кафки пришло: " + response.toString());
-        return new JSONObject((Map) response);
+        return kafkaService.friendshipSendAndReceive(request);
     }
-
 }

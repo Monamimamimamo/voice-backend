@@ -56,16 +56,25 @@ public class KafkaConfig  {
 
 
     @Bean
-    public ReplyingKafkaTemplate<Object, Object, Object> replyingKafkaTemplate(
+    public ReplyingKafkaTemplate<Object, Object, Object> friendshipReplyingKafkaTemplate(
             ProducerFactory<Object, Object> pf,
             ConcurrentKafkaListenerContainerFactory<Object, Object> factory) {
-
-        ConcurrentMessageListenerContainer<Object, Object> repliesContainer = factory.createContainer("chat_response_topic", "friendship_response_topic");
-        repliesContainer.getContainerProperties().setGroupId("group_id");
+        ConcurrentMessageListenerContainer<Object, Object> repliesContainer = factory.createContainer("friendship_response_topic");
+        repliesContainer.getContainerProperties().setGroupId("group_id1");
         repliesContainer.setAutoStartup(false);
         return new ReplyingKafkaTemplate<>(pf, repliesContainer);
     }
 
+    @Bean(name = "chatReplyingKafkaTemplate")
+    public ReplyingKafkaTemplate<Object, Object, Object> chatReplyingKafkaTemplate(
+            ProducerFactory<Object, Object> pf,
+            ConcurrentKafkaListenerContainerFactory<Object, Object> factory) {
+
+        ConcurrentMessageListenerContainer<Object, Object> repliesContainer = factory.createContainer("chat_response_topic");
+        repliesContainer.getContainerProperties().setGroupId("group_id2");
+        repliesContainer.setAutoStartup(false);
+        return new ReplyingKafkaTemplate<>(pf, repliesContainer);
+    }
 
     @Bean
     public ConcurrentKafkaListenerContainerFactory<Object, Object> kafkaListenerContainerFactory() {
@@ -75,8 +84,6 @@ public class KafkaConfig  {
         factory.setReplyTemplate(kafkaTemplate());
         return factory;
     }
-
-
 }
 
 
