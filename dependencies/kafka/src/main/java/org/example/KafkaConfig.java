@@ -24,8 +24,6 @@ public class KafkaConfig  {
 
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
-    @Autowired
-    private KafkaTopics kafkaTopics;
 
     @Bean
     public ProducerFactory<Object, Object> producerFactory() {
@@ -59,13 +57,13 @@ public class KafkaConfig  {
     public ReplyingKafkaTemplate<Object, Object, Object> friendshipReplyingKafkaTemplate(
             ProducerFactory<Object, Object> pf,
             ConcurrentKafkaListenerContainerFactory<Object, Object> factory) {
-        ConcurrentMessageListenerContainer<Object, Object> repliesContainer = factory.createContainer("friendship_response_topic");
+        ConcurrentMessageListenerContainer<Object, Object> repliesContainer = factory.createContainer("friendship_notification");
         repliesContainer.getContainerProperties().setGroupId("group_id1");
         repliesContainer.setAutoStartup(false);
         return new ReplyingKafkaTemplate<>(pf, repliesContainer);
     }
 
-    @Bean(name = "chatReplyingKafkaTemplate")
+    @Bean
     public ReplyingKafkaTemplate<Object, Object, Object> chatReplyingKafkaTemplate(
             ProducerFactory<Object, Object> pf,
             ConcurrentKafkaListenerContainerFactory<Object, Object> factory) {

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.KafkaService;
 import org.example.common.auth.JwtService;
 //import org.example.common.kafka.KafkaService;
 import org.example.domain.FriendshipOffer;
@@ -12,6 +13,7 @@ import org.example.domain.FriendshipOfferRepo;
 import org.example.domain.OperationStatus;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
@@ -27,8 +29,91 @@ public class FriendshipService {
     private static final RestTemplate restTemplate = new RestTemplate();
 
     private final FriendshipOfferRepo friendshipOfferRepo;
-//    private final KafkaService kafkaService;
+    private final KafkaService kafkaService;
     private final JwtService jwtService;
+
+
+    public ResponseEntity<FriendshipOffer> createOffer(String receiver, HttpServletRequest request) throws ExecutionException, InterruptedException {
+        String sender = jwtService.extractUserName(request);
+        FriendshipOffer existingOffer = friendshipOfferRepo.findBySenderAndReceiver(sender, receiver).orElse(friendshipOfferRepo.findByReceiverAndSender(sender, receiver).orElse(null));
+        LocalDateTime time = LocalDateTime.now();
+        if (existingOffer != null)
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        if (Objects.equals(sender, receiver))
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        existingOffer = FriendshipOffer.builder().sender(sender).receiver(receiver).status("pending").timestamp(time).build();
+        friendshipOfferRepo.save(existingOffer);
+        log.info("Сохранена запись: " + existingOffer);
+        Map<String, String> response = new HashMap<>();
+        response.put("receiver", existingOffer.getReceiver());
+        response.put("sender", existingOffer.getSender());
+        response.put("status", existingOffer.getStatus());
+        kafkaService.friendshipSendToNotification(response);
+        return ResponseEntity.ok(existingOffer);
+    }
+
+    public ResponseEntity<FriendshipOffer> acceptOffer(String sender, HttpServletRequest request){
+        String receiver = jwtService.extractUserName(request);
+        FriendshipOffer existingOffer = friendshipOfferRepo.findBySenderAndReceiver(sender, receiver).orElse(friendshipOfferRepo.findByReceiverAndSender(sender, receiver).orElse(null));
+        LocalDateTime time = LocalDateTime.now();
+        if (existingOffer == null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        else if (existingOffer.getStatus().equals("accepted"))
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        else {
+            if (!Objects.equals(existingOffer.getSender(), sender))
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//            String response = kafkaService.sendKafkaMessage(receiverId, senderId, "accepted");
+            //HTTP :)
+            StringBuilder sb = new StringBuilder();
+            String url = sb.append("https://voice-backend.ru:8083/api/Order/AddFriend?user=")
+                    .append(sender)
+                    .append("&friend=")
+                    .append(receiver)
+                    .toString();
+            HttpHeaders headers = new HttpHeaders();
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+            String response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    entity,
+                    String.class).getBody();
+//
+//            String operationStatus = responseEntity.getBody();
+            // :)
+            if (Objects.equals(response, "completed")) {
+                existingOffer.setTimestamp(time);
+                existingOffer.setStatus("accepted");
+                friendshipOfferRepo.save(existingOffer);
+                log.info("Сохранена запись: " + existingOffer);
+                // TODO отправить мессагу в нотификации
+                return ResponseEntity.ok(existingOffer);
+            } else {
+                return new ResponseEntity(HttpStatus.SERVICE_UNAVAILABLE);
+            }
+        }
+    }
+
+    public ResponseEntity<FriendshipOffer> refuseOffer(@RequestParam String sender,
+                                                       HttpServletRequest request){
+        String receiver = jwtService.extractUserName(request);
+        FriendshipOffer existingOffer = friendshipOfferRepo.findBySenderAndReceiver(sender, receiver).orElse(friendshipOfferRepo.findByReceiverAndSender(sender, receiver).orElse(null));
+        LocalDateTime time = LocalDateTime.now();
+        if (existingOffer == null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        else if (existingOffer.getStatus().equals("refused"))
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        else {
+            if (!Objects.equals(existingOffer.getSender(), sender))
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            existingOffer.setTimestamp(time);
+            existingOffer.setStatus("refused");
+            friendshipOfferRepo.save(existingOffer);
+            log.info("Сохранена запись: " + existingOffer);
+            // TODO отправить мессагу в нотификации
+            return ResponseEntity.ok(existingOffer);
+        }
+    }
 
     public ResponseEntity<OperationStatus> deletePendingOffer(HttpServletRequest request, String receiver){
         try {
@@ -43,11 +128,6 @@ public class FriendshipService {
         }
     }
 
-
-    public String deleteFromFriends(String user, String friend, String type) throws ExecutionException, InterruptedException {
-        return null;
-//        return kafkaService.sendKafkaMessage(user, friend, type);
-    }
 
     public void deleteByTimestampBefore(LocalDateTime timestamp) {
         friendshipOfferRepo.deleteByTimestampBefore(timestamp);

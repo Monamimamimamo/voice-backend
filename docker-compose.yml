@@ -80,10 +80,10 @@ services:
       - "9004:9004"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://friendship-offers-db:5432/friendship_manager
-      server.ssl.key-store: classpath:keystore.jks
-      server.ssl.key-store-type: JKS
-      server.ssl.key-store-password: aA258007195
       spring.kafka.bootstrap-servers: kafka:9001
+      #server.ssl.key-store: classpath:keystore.jks
+      #server.ssl.key-store-type: JKS
+      #server.ssl.key-store-password: aA258007195
 
 
 

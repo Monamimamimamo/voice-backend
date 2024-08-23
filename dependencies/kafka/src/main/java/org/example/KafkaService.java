@@ -21,15 +21,12 @@ import java.util.concurrent.ExecutionException;
 public class KafkaService{
     private final ReplyingKafkaTemplate<Object, Object, Object> friendshipReplyingKafkaTemplate;
     private final ReplyingKafkaTemplate<Object, Object, Object> chatReplyingKafkaTemplate;
-    private final KafkaTemplate<Object, Object> kafkaTemplate;
 
 
-    public Object friendshipSendAndReceive(Object map) throws ExecutionException, InterruptedException {
-        ProducerRecord<Object, Object> record = new ProducerRecord<>("friendship_request_topic", map);
-        log.info("В kafka отправлен объект: {} На топик: {}", record, "friendship_request_topic");
-        RequestReplyFuture<Object, Object, Object> futureResponse = friendshipReplyingKafkaTemplate.sendAndReceive(record, Duration.ofSeconds(7));
-        log.info("Из kafka получен объект: {}", futureResponse.get().value());
-        return futureResponse.get().value();
+    public void friendshipSendToNotification(Object map) throws ExecutionException, InterruptedException {
+        ProducerRecord<Object, Object> record = new ProducerRecord<>("friendship_notification", map);
+        log.info("В kafka отправлен объект: {} На топик: {}", record, "friendship_notification");
+        friendshipReplyingKafkaTemplate.send(record);
     }
 
     public Object chatSendAndReceive(Object map) throws ExecutionException, InterruptedException {
@@ -38,10 +35,5 @@ public class KafkaService{
         RequestReplyFuture<Object, Object, Object> futureResponse = chatReplyingKafkaTemplate.sendAndReceive(record, Duration.ofSeconds(7));
         log.info("Из kafka получен объект: {}", futureResponse.get().value());
         return futureResponse.get().value();
-    }
-
-    public void send(Object map, String sendTopic) throws ExecutionException, InterruptedException {
-        log.info("Отправлен объект: {}", map);
-        kafkaTemplate.send(sendTopic, map);
     }
 }

@@ -1,4 +1,4 @@
-var socket = new SockJS('http://localhost:9000/websocket?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6Ijc1NTZlMjBkLWE5MzItNDY4MC1iY2ZhLTIzYTQxN2UzYzZmMiIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6IiEhMSExMjIhISEhQHlhbmRleC5ydSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWUiOiJLaXJhIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiQURNSU4iLCJleHAiOjE3MjQ0MzM0MjMsImlzcyI6Imh0dHBzOi8vbG9jYWxob3N0OjcyNjYiLCJhdWQiOiJodHRwczovL2xvY2FsaG9zdDo3MjY2In0.iZJX44AOvy_vCsZSbbiNKKBXi5g8r8v44LdTiHhGi_Q');
+var socket = new SockJS('http://localhost:9000/websocket?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6Ijc1NTZlMjBkLWE5MzItNDY4MC1iY2ZhLTIzYTQxN2UzYzZmMiIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6IiEhMSExMjIhISEhQHlhbmRleC5ydSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWUiOiJLaXJhIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiQURNSU4iLCJleHAiOjE3MjQ1MDQ3NjgsImlzcyI6Imh0dHBzOi8vbG9jYWxob3N0OjcyNjYiLCJhdWQiOiJodHRwczovL2xvY2FsaG9zdDo3MjY2In0.S0zpYoD0L9Tq5O73-6XBLpoV7jIeVLWNJmcVue5Ce-M');
 var stompClient = Stomp.over(socket);
 
 function connect() {
@@ -8,6 +8,7 @@ function connect() {
         });
     }
 }
+
 
 // Функция для подписки на канал
 function subscribeToChannel() {
@@ -25,6 +26,12 @@ function subscribeToChannel() {
 // Функция для подписки на конкретный канал
 function subscribe(userId1, userId2) {
     stompClient.subscribe(`/topic/chat/${userId2}/${userId1}`, function(messageOutput) {
+        var message = JSON.parse(messageOutput.body);
+        displayMessage(message);
+    });
+
+
+    stompClient.subscribe(`/notification/${userId1}`, function(messageOutput) {
         var message = JSON.parse(messageOutput.body);
         displayMessage(message);
     });

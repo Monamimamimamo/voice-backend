@@ -7,13 +7,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.example.KafkaTopics;
 import org.example.domain.ExistingChatResponse;
 import org.example.domain.Message;
 import org.example.service.ChatService;
 import org.example.service.WebSocketService;
 import org.json.simple.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,9 +32,8 @@ import java.util.Map;
 public class ChatController {
     private final ChatService chatService;
     private final WebSocketService webSocketService;
-    private final KafkaTopics kafkaTopics;
 
-    @KafkaListener(topics = "chat_request_topic", groupId = "group_id")
+    @KafkaListener(topics = "chat_request_topic", groupId = "group_id2")
     @SendTo("chat_response_topic")
     public JSONObject getCurrencyData(ConsumerRecord<Object, Map<String, String>> record) {
         log.info(record.value().toString());
