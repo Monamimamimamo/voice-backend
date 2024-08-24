@@ -21,7 +21,7 @@ public class FriendshipKafkaHandler {
 
     private final SimpMessagingTemplate websocketTemplate;
 
-    @KafkaListener(topics = "friendship_notification", groupId = "group_id1")
+    @KafkaListener(topics = "friendship_notification", groupId = "group_id")
     public void handleFriendshipMessage(Object record) {
         log.info(STR."Из кафка пришло сообщение: \{record.toString()}");
 //        Map<String, Object> map = record.value();

@@ -79,7 +79,6 @@ public class KafkaConfig  {
         ConcurrentKafkaListenerContainerFactory<Object, Object> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
-        factory.setReplyTemplate(kafkaTemplate());
         return factory;
     }
 }
