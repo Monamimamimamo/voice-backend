@@ -48,7 +48,7 @@ public class FriendshipService {
         response.put("receiver", existingOffer.getReceiver());
         response.put("sender", existingOffer.getSender());
         response.put("status", existingOffer.getStatus());
-        kafkaService.send(response, "friendship_notification");
+        kafkaService.friendshipSendAndReceive(response);
         return ResponseEntity.ok(existingOffer);
     }
 

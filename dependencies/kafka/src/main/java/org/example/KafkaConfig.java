@@ -57,13 +57,13 @@ public class KafkaConfig  {
     public ReplyingKafkaTemplate<Object, Object, Object> friendshipReplyingKafkaTemplate(
             ProducerFactory<Object, Object> pf,
             ConcurrentKafkaListenerContainerFactory<Object, Object> factory) {
-        ConcurrentMessageListenerContainer<Object, Object> repliesContainer = factory.createContainer("friendship_notification");
+        ConcurrentMessageListenerContainer<Object, Object> repliesContainer = factory.createContainer("friendship_response_topic");
         repliesContainer.getContainerProperties().setGroupId("group_id1");
         repliesContainer.setAutoStartup(false);
         return new ReplyingKafkaTemplate<>(pf, repliesContainer);
     }
 
-    @Bean
+    @Bean(name = "chatReplyingKafkaTemplate")
     public ReplyingKafkaTemplate<Object, Object, Object> chatReplyingKafkaTemplate(
             ProducerFactory<Object, Object> pf,
             ConcurrentKafkaListenerContainerFactory<Object, Object> factory) {
@@ -79,6 +79,7 @@ public class KafkaConfig  {
         ConcurrentKafkaListenerContainerFactory<Object, Object> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
+        factory.setReplyTemplate(kafkaTemplate());
         return factory;
     }
 }

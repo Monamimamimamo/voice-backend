@@ -6,7 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.example.KafkaService;
 import org.example.common.auth.JwtService;
+import org.json.simple.JSONObject;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,8 +23,8 @@ public class FriendshipKafkaHandler {
 
     private final SimpMessagingTemplate websocketTemplate;
 
-    @KafkaListener(topics = "friendship_notification", groupId = "group_id")
-    public void handleFriendshipMessage(Object record) {
+    @KafkaListener(topics = "friendship_request_topic", groupId = "group_id1")
+    public void handleFriendshipMessage(Object  record) {
         log.info(STR."Из кафка пришло сообщение: \{record.toString()}");
 //        Map<String, Object> map = record.value();
 //        Map<String, String> response = new HashMap<>();

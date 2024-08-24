@@ -24,12 +24,10 @@ public class KafkaService{
     private final KafkaTemplate<Object, Object> kafkaTemplate;
 
 
-    public Object friendshipSendAndReceive(Object map) throws ExecutionException, InterruptedException {
+    public void friendshipSendAndReceive(Object map) throws ExecutionException, InterruptedException {
         ProducerRecord<Object, Object> record = new ProducerRecord<>("friendship_request_topic", map);
         log.info("В kafka отправлен объект: {} На топик: {}", record, "friendship_request_topic");
-        RequestReplyFuture<Object, Object, Object> futureResponse = friendshipReplyingKafkaTemplate.sendAndReceive(record, Duration.ofSeconds(7));
-        log.info("Из kafka получен объект: {}", futureResponse.get().value());
-        return futureResponse.get().value();
+        friendshipReplyingKafkaTemplate.send(record);
     }
 
     public Object chatSendAndReceive(Object map) throws ExecutionException, InterruptedException {
