@@ -44,11 +44,7 @@ public class FriendshipService {
         existingOffer = FriendshipOffer.builder().sender(sender).receiver(receiver).status("pending").timestamp(time).build();
         friendshipOfferRepo.save(existingOffer);
         log.info("Сохранена запись: " + existingOffer);
-        Map<String, String> response = new HashMap<>();
-        response.put("receiver", existingOffer.getReceiver());
-        response.put("sender", existingOffer.getSender());
-        response.put("status", existingOffer.getStatus());
-        kafkaService.friendshipSendAndReceive(response);
+        kafkaService.friendshipSendAndReceive(existingOffer);
         return ResponseEntity.ok(existingOffer);
     }
 
