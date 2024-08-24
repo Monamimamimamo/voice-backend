@@ -21,17 +21,17 @@ import java.util.concurrent.ExecutionException;
 @Slf4j
 public class FriendshipKafkaHandler {
 
-    private final SimpMessagingTemplate websocketTemplate;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @KafkaListener(topics = "friendship_request_topic", groupId = "group_id1")
     public void handleFriendshipMessage(ConsumerRecord<Object, Object>  record) {
-        log.info(STR."Из кафка пришло сообщение: \{record.toString()}");
-//        Map<String, Object> map = record.value();
-//        Map<String, String> response = new HashMap<>();
-//        response.put("type", "friendshipOffer");
-//        response.put("status", map.get("status").toString());
-//        response.put("sender", map.get("sender").toString());
-//        websocketTemplate.convertAndSend("/notification/" + map.get("receiver"), response);
-//        log.info("Отправляем вебсокет-сообщение на топик: " + "/notification/" + map.get("receiver"));
+        log.info(STR."Из кафка пришло сообщение: \{record.value().toString()}\nИз топика: \{record.topic()}");
+        Map<String, Object> map = (Map<String, Object>) record.value();
+        Map<String, String> response = new HashMap<>();
+        response.put("type", "friendshipOffer");
+        response.put("status", map.get("status").toString());
+        response.put("sender", map.get("sender").toString());
+        messagingTemplate.convertAndSend("/topic/notification/" + map.get("receiver"), response);
+        log.info("Отправляем вебсокет-сообщение на топик: " + "/notification/" + map.get("receiver"));
     }
 }

@@ -22,7 +22,6 @@ public class ChatWebSocketHandler {
 
     private final KafkaService kafkaService;
     private final ObjectMapper objectMapper;
-    private final SimpMessagingTemplate simpMessagingTemplate;
 
 
     @MessageMapping("/chat/{senderId}/{receiverId}")

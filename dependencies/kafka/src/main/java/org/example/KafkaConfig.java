@@ -53,7 +53,7 @@ public class KafkaConfig  {
     }
 
 
-    @Bean
+    @Bean(name = "friendshipReplyingKafkaTemplate")
     public ReplyingKafkaTemplate<Object, Object, Object> friendshipReplyingKafkaTemplate(
             ProducerFactory<Object, Object> pf,
             ConcurrentKafkaListenerContainerFactory<Object, Object> factory) {

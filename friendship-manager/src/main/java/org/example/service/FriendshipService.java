@@ -44,7 +44,12 @@ public class FriendshipService {
         existingOffer = FriendshipOffer.builder().sender(sender).receiver(receiver).status("pending").timestamp(time).build();
         friendshipOfferRepo.save(existingOffer);
         log.info("Сохранена запись: " + existingOffer);
-        kafkaService.friendshipSendAndReceive(existingOffer);
+        Map<String, String> response = new HashMap<>();
+        response.put("receiver", existingOffer.getReceiver());
+        response.put("sender", existingOffer.getSender());
+        response.put("status", existingOffer.getStatus());
+        // TODO сделать норм json конвертер для FriendshipOffer (поле даты)
+        kafkaService.friendshipSendAndReceive(response);
         return ResponseEntity.ok(existingOffer);
     }
 
